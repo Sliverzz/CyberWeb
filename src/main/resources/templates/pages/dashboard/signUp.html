@@ -33,44 +33,59 @@
             <div class="row">
                 <div class="col-lg-4 col-md-8 col-12 mx-auto">
                     <div class="card z-index-0 fadeIn3 fadeInBottom">
-                        <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
-                            <div class="bg-gradient-primary shadow-primary border-radius-lg py-3 pe-1">
-                                <h4 class="text-white font-weight-bolder text-center mt-2 mb-0">Sign Up</h4>
-                                <div class="row mt-3 justify-content-center">
-                                    <div class="col-2 text-center">
-                                        <a class="btn btn-link px-3" href="javascript:;">
-                                            <i class="fa fa-google text-white text-lg"></i>
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
+                        <div class="bg-gradient-primary shadow-primary border-radius-lg py-3 pe-1">
+                            <h4 class="text-white font-weight-bolder text-center mt-2 mb-0" style="">Sign Up</h4>
                         </div>
                         <div class="card-body">
-                            <form role="form" class="text-start">
-                                <div class="input-group input-group-outline my-3">
-                                    <input type="text" class="form-control" placeholder="Name">
+                            <form role="form" class="text-start" method="post" action="/user/signUp">
+                                <!-- 帳號密碼區 -->
+                                <div class="mb-4">
+                                    <h5 class="mb-3">Account Information</h5>
+                                    <div class="input-group input-group-outline mb-3">
+                                        <input type="text" class="form-control" placeholder="Username" name="username" required>
+                                    </div>
+                                    <div class="input-group input-group-outline mb-3">
+                                        <input type="email" class="form-control" placeholder="Email" name="email" required>
+                                    </div>
+                                    <div class="input-group input-group-outline mb-3">
+                                        <input type="password" class="form-control" placeholder="Password" name="password" required>
+                                    </div>
+                                    <div class="input-group input-group-outline mb-3">
+                                        <input type="password" class="form-control" placeholder="Confirm Password" name="confirmPassword" required>
+                                    </div>
                                 </div>
-                                <div class="input-group input-group-outline mb-3">
-                                    <input type="email" class="form-control" placeholder="Email">
+
+                                <!-- 個人資料區 -->
+                                <div>
+                                    <h5 class="mb-3">Personal Information</h5>
+                                    <div class="input-group input-group-outline mb-3">
+                                        <input type="text" class="form-control" placeholder="First Name" name="firstName" required>
+                                    </div>
+                                    <div class="input-group input-group-outline mb-3">
+                                        <input type="text" class="form-control" placeholder="Last Name" name="lastName" required>
+                                    </div>
+                                    <div class="input-group input-group-outline mb-3">
+                                        <input type="text" class="form-control" placeholder="Phone Number" name="phoneNumber">
+                                    </div>
                                 </div>
-                                <div class="input-group input-group-outline mb-3">
-                                    <input type="password" class="form-control" placeholder="Password">
-                                </div>
-                                <div class="input-group input-group-outline mb-3">
-                                    <input type="password" class="form-control" placeholder="Confirm Password">
-                                </div>
+
+                                <!-- 條款同意 -->
                                 <div class="form-check form-check-info text-start ps-0">
-                                    <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
+                                    <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault" required>
                                     <label class="form-check-label" for="flexCheckDefault">
                                         I agree to the <a href="javascript:;" class="text-dark font-weight-bolder">Terms and Conditions</a>
                                     </label>
                                 </div>
+
+                                <!-- 提交按鈕 -->
                                 <div class="text-center">
-                                    <button type="button" class="btn bg-gradient-primary w-100 my-4 mb-2">登入</button>
+                                    <button type="submit" class="btn bg-gradient-primary w-100 my-4 mb-2">Sign Up</button>
                                 </div>
+
+                                <!-- 登入連結 -->
                                 <p class="mt-4 text-sm text-center">
-                                    已經有帳號了嗎?
-                                    <a href="/dashboard/login" class="text-primary text-gradient font-weight-bold">登入</a>
+                                    Already have an account?
+                                    <a href="/dashboard/login" class="text-primary text-gradient font-weight-bold">Login</a>
                                 </p>
                             </form>
                         </div>

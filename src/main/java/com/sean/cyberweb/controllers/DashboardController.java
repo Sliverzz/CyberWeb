@@ -26,9 +26,21 @@ public class DashboardController {
         return "pages/dashboard/signUp";
     }
 
+    // 使用者管理
+    @GetMapping("/user")
+    public String user(){
+        return "pages/dashboard/user";
+    }
+
     // 商品管理
     @GetMapping("/product")
-    public String header() {
+    public String product() {
         return "pages/dashboard/product";
+    }
+
+    // 訂單管理
+    @GetMapping("/order")
+    public String order(){
+        return "pages/dashboard/order";
     }
 }
