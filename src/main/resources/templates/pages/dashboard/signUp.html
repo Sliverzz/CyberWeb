@@ -28,6 +28,23 @@
     <!-- Nepcha is a easy-to-use web analytics. No cookies and fully compliant with GDPR, CCPA and PECR. -->
     <script defer data-site="YOUR_DOMAIN_HERE" src="https://api.nepcha.com/js/nepcha-analytics.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        /*Validate css*/
+        .feedback-message {
+            display: block; /* 確保它是塊級元素，這樣就會出現在新行 */
+            font-size: 0.8rem; /* 可以根據需要調整字體大小 */
+            margin-top: 5px; /* 與輸入框之間的間隙 */
+        }
+
+        .invalid-feedback {
+            color: red; /* 錯誤訊息顯示紅色 */
+        }
+
+        .valid-feedback {
+            color: green; /* 正確訊息顯示綠色 */
+        }
+
+    </style>
 </head>
 
 <body class="bg-gray-200" data-flash-message="[[${flashMessage}]]">
@@ -163,19 +180,57 @@
         });
     }
 
-    // 檢查確認密碼是否與密碼相同
-
-
-    // ajax檢查帳號跟email是否存在
+    /* 以下功能:
+    * 1.檢查密碼與確認密碼相同
+    * 2.檢查電話號碼09開頭且10碼
+    * 3.Ajax檢查帳號與email是否存在
+    * */
     $(document).ready(function() {
-        $('.name, .email').blur(function() {
-            var input = $(this);
+        var isUsernameEmailValid = false;
+        var isEmailValid = false;
+
+        function createFeedbackElement(input, id) {
+            var feedbackElement = $('#' + id);
+            if (!feedbackElement.length) {
+                input.after('<span id="' + id + '" class="feedback-message"></span>');
+                feedbackElement = $('#' + id);
+            }
+            return feedbackElement;
+        }
+
+        function checkPasswords() {
+            var password = $("input[name='password']");
+            var confirmPassword = $("input[name='confirmPassword']");
+            var feedbackElement = createFeedbackElement(confirmPassword, 'confirmPassword-feedback');
+
+            if (password.val() !== confirmPassword.val()) {
+                feedbackElement.text('Passwords do not match.').addClass('invalid-feedback');
+                return false;
+            } else {
+                feedbackElement.text('').removeClass('invalid-feedback');
+                return true;
+            }
+        }
+
+        function checkPhoneNumber() {
+            var phoneNumber = $("input[name='phoneNumber']");
+            var feedbackElement = createFeedbackElement(phoneNumber, 'phoneNumber-feedback');
+            var phonePattern = /^09\d{8}$/;
+
+            if (!phonePattern.test(phoneNumber.val())) {
+                feedbackElement.text('Phone number must start with 09 and be 10 digits long').addClass('invalid-feedback');
+                return false;
+            } else {
+                feedbackElement.text('').removeClass('invalid-feedback');
+                return true;
+            }
+        }
+
+        function checkFieldExistence(input) {
             var field = input.attr('name');
             var value = input.val();
             var data = {};
             data[field] = value;
-
-            // spring security 存取令牌
             var token = $("meta[name='_csrf']").attr("content");
             var header = $("meta[name='_csrf_header']").attr("content");
 
@@ -188,27 +243,51 @@
                     xhr.setRequestHeader(header, token);
                 },
                 success: function(response) {
-                    var feedbackElement = $('#' + field + '-feedback');
-                    if (!feedbackElement.length) {
-                        // 如果反饋元素不存在，則創建它
-                        input.after('<span id="' + field + '-feedback"></span>');
-                        feedbackElement = $('#' + field + '-feedback');
-                    }
+                    var feedbackElement = createFeedbackElement(input, field + '-feedback');
 
                     if (response.exists) {
-                        // 如果存在，顯示紅色叉叉
-                        feedbackElement.html('❌');
+                        feedbackElement.text(field + ' already exists.').addClass('invalid-feedback');
+                        if(field === 'username') {
+                            isUsernameValid = false;
+                        } else if(field === 'email') {
+                            isEmailValid = false;
+                        }
                     } else {
-                        // 如果不存在，顯示綠色勾勾
-                        feedbackElement.html('✅');
+                        feedbackElement.text('').removeClass('invalid-feedback');
+                        if(field === 'username') {
+                            isUsernameValid = true;
+                        } else if(field === 'email') {
+                            isEmailValid = true;
+                        }
                     }
                 },
                 error: function() {
                     console.log('Error checking ' + field + ' existence.');
+                    if(field === 'username') {
+                        isUsernameValid = false;
+                    } else if(field === 'email') {
+                        isEmailValid = false;
+                    }
                 }
             });
+        }
+
+        $("input[name='password'], input[name='confirmPassword']").on('keyup', checkPasswords);
+        $("input[name='phoneNumber']").on('keyup', checkPhoneNumber);
+        $('.name, .email').blur(function() {
+            checkFieldExistence($(this));
+        });
+
+        $('form').on('submit', function(e) {
+            var arePasswordsValid = checkPasswords();
+            var isPhoneNumberValid = checkPhoneNumber();
+
+            if (!arePasswordsValid || !isUsernameValid || !isEmailValid || !isPhoneNumberValid) {
+                e.preventDefault();
+            }
         });
     });
+
 </script>
 </body>
 </html>
