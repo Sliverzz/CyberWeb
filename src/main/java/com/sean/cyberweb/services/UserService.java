@@ -1,6 +1,7 @@
 package com.sean.cyberweb.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,6 +19,7 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
+    // 註冊
     @Transactional
     public boolean registerUser(User user) {
         // 檢查使用者名稱或電子郵件是否已被註冊
@@ -27,8 +29,7 @@ public class UserService {
         }
 
         // 加密使用者密碼，確保安全性
-        // 假設有一個方法 encryptPassword 來加密密碼
-//        user.setPassword(encryptPassword(user.getPassword()));
+        user.setPassword(encryptPassword(user.getPassword()));
 
         // 保存使用者到數據庫
         userRepository.save(user);
@@ -37,8 +38,21 @@ public class UserService {
         return true;
     }
 
-//    private String encryptPassword(String password) {
-//        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-//        return passwordEncoder.encode(password);
-//    }
+    // 密碼加密
+    private String encryptPassword(String password) {
+        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        return passwordEncoder.encode(password);
+    }
+
+    // 檢查帳號
+    public boolean usernameExists(String username) {
+        // 檢查用戶名是否已存在於數據庫中
+        return userRepository.existsByUsername(username);
+    }
+
+    // 檢查email
+    public boolean emailExists(String email) {
+        // 檢查電子郵件是否已存在於數據庫中
+        return userRepository.existsByEmail(email);
+    }
 }

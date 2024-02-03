@@ -4,6 +4,10 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- spring security存取令牌 -->
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+
     <link rel="apple-touch-icon" sizes="76x76" href="/assets/img/apple-icon.png">
     <link rel="icon" type="image/png" href="/assets/img/logos/cyber-web-logo.png">
     <title>
@@ -23,9 +27,10 @@
     <!-- Nepcha Analytics (nepcha.com) -->
     <!-- Nepcha is a easy-to-use web analytics. No cookies and fully compliant with GDPR, CCPA and PECR. -->
     <script defer data-site="YOUR_DOMAIN_HERE" src="https://api.nepcha.com/js/nepcha-analytics.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
-<body class="bg-gray-200">
+<body class="bg-gray-200" data-flash-message="[[${flashMessage}]]">
 <main class="main-content  mt-0">
     <div class="page-header align-items-start min-vh-100" style="background-image: url('/assets/img/cyber-web-wallpaper.jpg');">
         <span class="mask bg-gradient-dark opacity-6"></span>
@@ -37,15 +42,15 @@
                             <h4 class="text-white font-weight-bolder text-center mt-2 mb-0" style="">Sign Up</h4>
                         </div>
                         <div class="card-body">
-                            <form role="form" class="text-start" method="post" action="/user/signUp">
+                            <form role="form" class="text-start" th:method="post" th:action="@{/user/signUp}">
                                 <!-- 帳號密碼區 -->
                                 <div class="mb-4">
                                     <h5 class="mb-3">Account Information</h5>
                                     <div class="input-group input-group-outline mb-3">
-                                        <input type="text" class="form-control" placeholder="Username" name="username" required>
+                                        <input type="text" class="form-control name" placeholder="Username" name="username" required>
                                     </div>
                                     <div class="input-group input-group-outline mb-3">
-                                        <input type="email" class="form-control" placeholder="Email" name="email" required>
+                                        <input type="email" class="form-control email" placeholder="Email" name="email" required>
                                     </div>
                                     <div class="input-group input-group-outline mb-3">
                                         <input type="password" class="form-control" placeholder="Password" name="password" required>
@@ -114,7 +119,14 @@
 <script src="/assets/js/core/bootstrap.min.js"></script>
 <script src="/assets/js/plugins/perfect-scrollbar.min.js"></script>
 <script src="/assets/js/plugins/smooth-scrollbar.min.js"></script>
-<script>
+<!-- Control Center for Material Dashboard: parallax effects, scripts for the example pages etc -->
+<script src="/assets/js/material-dashboard.min.js?v=3.1.0"></script>
+<!-- Ajax -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<!-- Validate -->
+<script src="https://ajax.aspnetcdn.com/ajax/jquery.validate/1.19.3/jquery.validate.js"></script>
+
+<script th:inline="javascript">
     var win = navigator.platform.indexOf('Win') > -1;
     if (win && document.querySelector('#sidenav-scrollbar')) {
         var options = {
@@ -122,11 +134,81 @@
         }
         Scrollbar.init(document.querySelector('#sidenav-scrollbar'), options);
     }
-</script>
-<!-- Github buttons -->
-<script async defer src="https://buttons.github.io/buttons.js"></script>
-<!-- Control Center for Material Dashboard: parallax effects, scripts for the example pages etc -->
-<script src="/assets/js/material-dashboard.min.js?v=3.1.0"></script>
-</body>
 
+    // swl2
+    var flashMessage = /*[[${flashMessage}]]*/ null;
+    var flashMessageType = /*[[${flashMessageType}]]*/ null;
+
+    if (flashMessage && flashMessageType) {
+        var icon = 'info'; // 默認圖標
+
+        switch(flashMessageType) {
+            case 'success':
+                icon = 'success';
+                break;
+            case 'error':
+                icon = 'error';
+                break;
+            case 'warning':
+                icon = 'warning';
+                break;
+            // 更多的情況可以繼續添加
+        }
+
+        Swal.fire({
+            title: 'Notification',
+            text: flashMessage,
+            icon: icon,
+            confirmButtonText: 'OK'
+        });
+    }
+
+    // 檢查確認密碼是否與密碼相同
+
+
+    // ajax檢查帳號跟email是否存在
+    $(document).ready(function() {
+        $('.name, .email').blur(function() {
+            var input = $(this);
+            var field = input.attr('name');
+            var value = input.val();
+            var data = {};
+            data[field] = value;
+
+            // spring security 存取令牌
+            var token = $("meta[name='_csrf']").attr("content");
+            var header = $("meta[name='_csrf_header']").attr("content");
+
+            $.ajax({
+                url: '/user/ajaxCheckExistence',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(data),
+                beforeSend: function(xhr) {
+                    xhr.setRequestHeader(header, token);
+                },
+                success: function(response) {
+                    var feedbackElement = $('#' + field + '-feedback');
+                    if (!feedbackElement.length) {
+                        // 如果反饋元素不存在，則創建它
+                        input.after('<span id="' + field + '-feedback"></span>');
+                        feedbackElement = $('#' + field + '-feedback');
+                    }
+
+                    if (response.exists) {
+                        // 如果存在，顯示紅色叉叉
+                        feedbackElement.html('❌');
+                    } else {
+                        // 如果不存在，顯示綠色勾勾
+                        feedbackElement.html('✅');
+                    }
+                },
+                error: function() {
+                    console.log('Error checking ' + field + ' existence.');
+                }
+            });
+        });
+    });
+</script>
+</body>
 </html>
