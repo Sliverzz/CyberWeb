@@ -42,6 +42,10 @@ public class User {
     @Column(name = "date_created", nullable = false)
     private LocalDateTime dateCreated = LocalDateTime.now(); // 帳戶創建時間
 
+    //    暫時不需要role，需要再開。
+    //    @Column(name = "role", nullable = false)
+    //    private String role;
+
     @UpdateTimestamp
     @Column(name = "last_updated")
     private LocalDateTime lastUpdated; // 帳戶最後更新時間

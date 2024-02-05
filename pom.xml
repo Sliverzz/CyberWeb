@@ -78,6 +78,13 @@
             <version>6.2.1</version>
         </dependency>
 
+        <!-- thymeleaf針對spring security6的擴充包 -->
+        <dependency>
+            <groupId>org.thymeleaf.extras</groupId>
+            <artifactId>thymeleaf-extras-springsecurity6</artifactId>
+            <version>3.1.2.RELEASE</version>
+        </dependency>
+
     </dependencies>
 
     <build>

@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class IndexController {
 
     // 首頁
-    @GetMapping("/")
+    @GetMapping("/index")
     public String home() {
-        return "pages/site/index";
+        return "/pages/site/index";
     }
 }

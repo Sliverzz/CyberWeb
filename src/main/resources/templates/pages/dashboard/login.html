@@ -4,10 +4,6 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <!-- spring security存取令牌 -->
-  <meta name="_csrf" th:content="${_csrf.token}"/>
-  <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
-
   <link rel="apple-touch-icon" sizes="76x76" href="/assets/img/apple-icon.png">
   <link rel="icon" type="image/png" href="/assets/img/logos/cyber-web-logo.png">
   <title>
@@ -29,6 +25,39 @@
   <script defer data-site="YOUR_DOMAIN_HERE" src="https://api.nepcha.com/js/nepcha-analytics.js"></script>
     <!-- swl2 -->
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <style>
+      /* 定義超微幅震動效果 */
+      @keyframes microShake {
+          0%, 100% {
+              transform: translateX(0);
+          }
+          25% {
+              transform: translateX(-2px);
+          }
+          50% {
+              transform: translateX(2px);
+          }
+          75% {
+              transform: translateX(-2px);
+          }
+      }
+
+      /* 應用動畫到錯誤消息容器 */
+      .custom-error-message {
+          animation: microShake 0.5s ease-in-out;
+          background-color: #f8d7da; /* 粉紅色背景 */
+          text-align: center;
+          color: #721c24; /* 深紅色文字 */
+          border-color: #f5c6cb; /* 邊框顏色 */
+          border-radius: .50rem; /* 圓角邊框 */
+          padding: .40rem 1rem; /* 內邊距 */
+          margin-bottom: 0.5rem; /* 下邊距 */
+          border: 1px solid transparent; /* 透明邊框 */
+          display: block; /* 使div塊級顯示 */
+          width: 100%; /* 寬度100% */
+          box-sizing: border-box; /* 盒模型設定 */
+      }
+  </style>
 </head>
 
 <body class="bg-gray-200" data-flash-message="[[${flashMessage}]]">
@@ -45,19 +74,23 @@
                 </div>
               </div>
               <div class="card-body">
-                <form role="form" class="text-start" th:method="post"> <!-- 還沒寫action -->
+                <form role="form" class="text-start" th:method="post" th:action="@{/login}">
                   <div class="input-group input-group-outline my-3">
-                    <input type="email" class="form-control" placeholder="Username">
+                    <input type="text" class="form-control" placeholder="Username" name="username" required>
                   </div>
                   <div class="input-group input-group-outline mb-3">
-                    <input type="password" class="form-control" placeholder="Password">
+                    <input type="password" class="form-control" placeholder="Password" name="password" required>
                   </div>
                   <div class="form-check form-switch d-flex align-items-center mb-3">
                     <input class="form-check-input" type="checkbox" id="rememberMe">
                     <label class="form-check-label mb-0 ms-3" for="rememberMe">Remember me</label>
                   </div>
-                  <div class="text-center">
-                    <button type="button" class="btn bg-gradient-primary w-100 my-4 mb-2">login</button>
+                    <!-- 檢查URL中是否有登入錯誤訊息，有就顯示帳號或密碼錯誤 -->
+                    <div th:if="${param.error}" class="alert alert-warning custom-error-message" role="alert">
+                        Username or password is incorrect.
+                    </div>
+                    <div class="text-center">
+                    <button type="submit" class="btn bg-gradient-primary w-100 my-4 mb-2">login</button>
                   </div>
                   <p class="mt-4 text-sm text-center">
                       Don't have an account ?

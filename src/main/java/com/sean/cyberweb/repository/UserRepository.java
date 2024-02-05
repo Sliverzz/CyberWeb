@@ -8,9 +8,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     // 找帳號
     User findByUsername(String username);
     
-    // 找Email
-    User findByEmail(String email);
-    
     // 檢查帳號是否存在
     boolean existsByUsername(String username);
     
