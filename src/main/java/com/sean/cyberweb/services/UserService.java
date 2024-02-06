@@ -1,6 +1,9 @@
 package com.sean.cyberweb.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -11,11 +14,13 @@ import com.sean.cyberweb.repository.UserRepository;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final BCryptPasswordEncoder passwordEncoder;
 
     // 使用構造函數注入 UserRepository
-    @Autowired //spring boot 4.3以上可省略
+    @Autowired
     public UserService(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     // 註冊
@@ -38,8 +43,6 @@ public class UserService {
 
     // 密碼加密
     private String encryptPassword(String password) {
-        // 只有註冊會有密碼加密行為，所以寫成局部變量
-        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         return passwordEncoder.encode(password);
     }
 
@@ -51,5 +54,37 @@ public class UserService {
     // 註冊頁-檢查email是否存在
     public boolean emailExists(String email) {
         return userRepository.existsByEmail(email);
+    }
+
+    // 更新後台使用者資料
+    @Transactional
+    public void updateUserProfile(User updatedUserDetails) throws Exception {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentUsername = ((UserDetails)authentication.getPrincipal()).getUsername();
+        User currentUser = userRepository.findByUsername(currentUsername)
+                .orElseThrow(() -> new Exception("User not found with username: " + currentUsername));
+
+        currentUser.setFirstName(updatedUserDetails.getFirstName());
+        currentUser.setLastName(updatedUserDetails.getLastName());
+        currentUser.setEmail(updatedUserDetails.getEmail());
+        currentUser.setPhoneNumber(updatedUserDetails.getPhoneNumber());
+        currentUser.setProfileImagePath(updatedUserDetails.getProfileImagePath());
+
+        userRepository.save(currentUser);
+    }
+
+    // 獲取當前用戶
+    public User getCurrentUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return null;
+        }
+        Object principal = authentication.getPrincipal();
+        if (principal instanceof UserDetails) {
+            String username = ((UserDetails)principal).getUsername();
+            return userRepository.findByUsername(username)
+                    .orElse(null); // 更安全地處理空值
+        }
+        return null;
     }
 }

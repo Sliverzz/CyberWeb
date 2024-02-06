@@ -38,7 +38,7 @@ public class SecurityConfig {
                         .sessionRegistry(sessionRegistry()) // 使用自定義的sessionRegistry
                 )
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/dashboard/login", "/dashboard/signUp").permitAll() // 允許訪問登入和註冊頁面(先這樣寫測試因為@PreAuthorize失效)
+                        .requestMatchers("/dashboard/login", "/dashboard/signUp").permitAll() // 允許訪問登入和註冊頁面
                         .requestMatchers("/dashboard/**").authenticated() // "/dashboard/**"下的所有請求都需要驗證
                         .anyRequest().permitAll() // 其他所有請求允許訪問
                 )

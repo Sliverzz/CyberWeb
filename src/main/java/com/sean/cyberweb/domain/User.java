@@ -3,6 +3,9 @@ package com.sean.cyberweb.domain;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDateTime;
 
@@ -45,6 +48,21 @@ public class User {
     //    暫時不需要role，需要再開。
     //    @Column(name = "role", nullable = false)
     //    private String role;
+
+    @Column(name = "profile_image_path")
+    private String profileImagePath;
+
+    public boolean hasAvatar() {
+        return profileImagePath != null && !profileImagePath.isEmpty();
+    }
+
+    public String getAvatarUrl() {
+        if (hasAvatar()) {
+            return profileImagePath;
+        } else {
+            return "/assets/img/profileImg/profile-img.png";
+        }
+    }
 
     @UpdateTimestamp
     @Column(name = "last_updated")
