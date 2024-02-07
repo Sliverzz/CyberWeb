@@ -23,7 +23,7 @@
   <!-- Nepcha Analytics (nepcha.com) -->
   <!-- Nepcha is a easy-to-use web analytics. No cookies and fully compliant with GDPR, CCPA and PECR. -->
   <script defer data-site="YOUR_DOMAIN_HERE" src="https://api.nepcha.com/js/nepcha-analytics.js"></script>
-    <!-- swl2 -->
+  <!-- swl2 -->
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <style>
       /* 定義超微幅震動效果 */
@@ -82,8 +82,8 @@
                     <input type="password" class="form-control" placeholder="Password" name="password" required>
                   </div>
                   <div class="form-check form-switch d-flex align-items-center mb-3">
-                    <input class="form-check-input" type="checkbox" id="rememberMe">
-                    <label class="form-check-label mb-0 ms-3" for="rememberMe">Remember me</label>
+                      <input class="form-check-input" type="checkbox" id="rememberMe" name="remember-me">
+                      <label class="form-check-label" for="rememberMe">&nbspRemember me</label>
                   </div>
                     <!-- 檢查URL中是否有登入錯誤訊息，有就顯示帳號或密碼錯誤 -->
                     <div th:if="${param.error}" class="alert alert-warning custom-error-message" role="alert">

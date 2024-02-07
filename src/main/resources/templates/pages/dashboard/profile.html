@@ -67,6 +67,21 @@
             left: 50%;
             transform: translateX(-50%);
         }
+
+        .feedback-message {
+            display: block; /* 確保它是塊級元素，這樣就會出現在新行 */
+            font-size: 0.8rem; /* 可以根據需要調整字體大小 */
+            margin-top: 5px; /* 與輸入框之間的間隙 */
+        }
+
+        .invalid-feedback {
+            color: red; /* 錯誤訊息顯示紅色 */
+        }
+
+        .valid-feedback {
+            color: green; /* 正確訊息顯示綠色 */
+        }
+
     </style>
 </head>
 <body>
@@ -78,7 +93,7 @@
                 <!-- 頭像表單 -->
                 <form role="form" th:action="@{/img/upload}" th:method="post" enctype="multipart/form-data">
                     <!-- 用戶id -->
-                    <input type="hidden" name="id" th:value="${user.id}">
+                    <input type="hidden" name="userHashId" th:value="${userHashId}">
                     <div class="profile-img-container">
                         <img class="rounded-circle mt-5" width="150px" th:src="${avatarUrl}">
                         <label for="profile-img-input" class="edit-img-icon">
@@ -96,14 +111,22 @@
         </div>
         <div class="col-md-8">
             <!-- 個人資料表單 -->
-            <form role="form" th:action="@{/user/profile}" th:method="post">
+            <form role="form" id="profileForm" th:action="@{/user/profile}" th:method="post">
                 <!-- 用戶id -->
-                <input type="hidden" name="id" th:value="${user.id}">
+                <input type="hidden" name="userHashId" th:value="${userHashId}">
                 <div class="p-3 py-5">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h4 class="text-right">Profile Settings</h4>
                     </div>
                     <div class="row mt-2">
+                        <div class="col-md-6">
+                            <label class="labels">User Name</label>
+                            <input type="text" class="form-control" placeholder="User Name" name="username" th:value="${user.username}" style="border: 1px solid #ced4da !important; border-radius: 0.25rem !important; padding: 10px;" readonly>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="labels">E-mail</label>
+                            <input type="text" class="form-control" placeholder="E-mail" name="email" th:value="${user.email}" style="border: 1px solid #ced4da !important; border-radius: 0.25rem !important; padding: 10px;" readonly>
+                        </div>
                         <div class="col-md-6">
                             <label class="labels">First Name</label>
                             <input type="text" class="form-control" placeholder="First Name" name="firstName" th:value="${user.firstName}" style="border: 1px solid #ced4da !important; border-radius: 0.25rem !important; padding: 10px;">
@@ -113,16 +136,8 @@
                             <input type="text" class="form-control" placeholder="Last Name" name="lastName" th:value="${user.lastName}" style="border: 1px solid #ced4da !important; border-radius: 0.25rem !important; padding: 10px;">
                         </div>
                         <div class="col-md-6">
-                            <label class="labels">E-mail</label>
-                            <input type="text" class="form-control" placeholder="E-mail" name="email" th:value="${user.email}" style="border: 1px solid #ced4da !important; border-radius: 0.25rem !important; padding: 10px;">
-                        </div>
-                        <div class="col-md-6">
                             <label class="labels">Phone Number</label>
                             <input type="text" class="form-control" placeholder="Phone Number" name="phoneNumber" th:value="${user.phoneNumber}" style="border: 1px solid #ced4da !important; border-radius: 0.25rem !important; padding: 10px;">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="labels">User Name</label>
-                            <input type="text" class="form-control" placeholder="User Name" name="username" th:value="${user.username}" style="border: 1px solid #ced4da !important; border-radius: 0.25rem !important; padding: 10px;" readonly>
                         </div>
                     </div>
                     <div class="mt-5 text-center form-footer">
@@ -146,6 +161,32 @@
             reader.readAsDataURL(event.target.files[0]);
         }
     }
+
+    $.validator.addMethod("regex", function(value, element, regexpr) {
+        return regexpr.test(value);
+    }, "Please enter a valid phone number.");
+
+    $(document).ready(function() {
+        $("#profileForm").validate({
+            rules: {
+                phoneNumber: {
+                    required: true,
+                    regex: /^09\d{8}$/
+                }
+            },
+            messages: {
+                phoneNumber: {
+                    required: "Please enter your phone number.",
+                    regex: "Phone number must start with 09 and be 10 digits long."
+                }
+            },
+            errorPlacement: function(error, element) {
+                error.css('color', 'red');
+                error.insertAfter(element);
+            }
+        });
+    });
+
 </script>
 </body>
 </html>

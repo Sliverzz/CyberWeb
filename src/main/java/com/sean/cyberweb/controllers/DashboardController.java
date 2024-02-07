@@ -8,14 +8,16 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
 @Controller
 @RequestMapping("/dashboard")
 public class DashboardController {
 
     private final UserService userService;
 
-    // 使用構造函數注入 UserService
-    @Autowired //spring boot 4.3以上可省略
+    @Autowired
     public DashboardController (UserService userService){
         this.userService = userService;
     }
@@ -36,21 +38,32 @@ public class DashboardController {
     @GetMapping("/index")
     public String dashboard(Model model) {
         User currentUser = userService.getCurrentUser();
+
+        // hashId處理
+        String userHashId = userService.encode(currentUser.getId());
+
+        model.addAttribute("userHashId", userHashId);
         model.addAttribute("user", currentUser);
         return "/pages/dashboard/index";
     }
 
     // 使用者管理
     @GetMapping("/profile")
-    public String profile(Model model){
+    public String profile(Model model) {
         User currentUser = userService.getCurrentUser();
 
-        // 获取用户头像逻辑
-        String avatarUrl = "/assets/img/profileImg/profile-img.png"; // 預設頭向
-        if (currentUser.hasAvatar()) {
-            avatarUrl = currentUser.getProfileImagePath(); // 用戶頭像URL，使用 profileImagePath 属性
+        // hashId處理
+        String userHashId = userService.encode(currentUser.getId());
+
+        // 預設頭像的Web路徑
+        String avatarUrl = "/assets/img/profileImg/profile-img.png";
+        // 檢查用戶是否有設定頭像
+        if (currentUser.hasAvatar() && currentUser.getProfileImagePath() != null) {
+            // 直接使用用戶設定的頭像路徑
+            avatarUrl = currentUser.getProfileImagePath();
         }
 
+        model.addAttribute("userHashId", userHashId);
         model.addAttribute("user", currentUser);
         model.addAttribute("avatarUrl", avatarUrl); // 將頭像URL添加到模型
 
@@ -61,6 +74,11 @@ public class DashboardController {
     @GetMapping("/product")
     public String product(Model model) {
         User currentUser = userService.getCurrentUser();
+
+        // hashId處理
+        String userHashId = userService.encode(currentUser.getId());
+
+        model.addAttribute("userHashId", userHashId);
         model.addAttribute("user", currentUser);
         return "/pages/dashboard/product";
     }
@@ -69,6 +87,11 @@ public class DashboardController {
     @GetMapping("/order")
     public String order(Model model){
         User currentUser = userService.getCurrentUser();
+
+        // hashId處理
+        String userHashId = userService.encode(currentUser.getId());
+
+        model.addAttribute("userHashId", userHashId);
         model.addAttribute("user", currentUser);
         return "/pages/dashboard/order";
     }

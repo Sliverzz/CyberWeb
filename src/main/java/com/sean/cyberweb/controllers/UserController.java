@@ -18,8 +18,7 @@ public class UserController {
 
     private final UserService userService;
 
-    // 使用構造函數注入 UserService
-    @Autowired //spring boot 4.3以上可省略
+    @Autowired
     public UserController (UserService userService){
         this.userService = userService;
     }
@@ -60,15 +59,25 @@ public class UserController {
         return response;
     }
 
-    // 後台使用者資料
+    // 更新用使用者資料
     @PostMapping("/profile")
-    public String updateUserProfile(User user, RedirectAttributes redirectAttributes) {
+    public String updateUserProfile(@RequestParam(value = "userHashId", required = false) String userHashId, User user, RedirectAttributes redirectAttributes) {
         try {
+            // 解碼hashId
+            Long userId = userService.decode(userHashId);
+            if (userId == null) {
+                throw new IllegalArgumentException("Invalid user identifier.");
+            }
+            // 確保更新時是正確id
+            user.setId(userId);
+
             userService.updateUserProfile(user);
-            redirectAttributes.addFlashAttribute("message", "Profile updated successfully!");
+            redirectAttributes.addFlashAttribute("flashMessageType", "success");
+            redirectAttributes.addFlashAttribute("flashMessage", "Profile updated successfully!");
             return "redirect:/dashboard/profile";
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("message", "Update failed: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("flashMessageType", "error");
+            redirectAttributes.addFlashAttribute("flashMessage", "Update failed: " + e.getMessage());
             return "redirect:/dashboard/profile";
         }
     }

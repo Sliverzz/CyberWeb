@@ -1,5 +1,6 @@
 package com.sean.cyberweb.services;
 
+import org.hashids.Hashids;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -10,17 +11,27 @@ import org.springframework.transaction.annotation.Transactional;
 import com.sean.cyberweb.domain.User;
 import com.sean.cyberweb.repository.UserRepository;
 
+import java.io.IOException;
+import org.springframework.web.multipart.MultipartFile;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+
+
 @Service
 public class UserService {
 
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
+    private static final String UPLOAD_DIR = "C:\\Users\\ML2\\Desktop\\Cyber Web\\Img\\avatar";
+    private final Hashids hashids;
 
-    // 使用構造函數注入 UserRepository
     @Autowired
     public UserService(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.hashids = new Hashids("sean_salt_2024", 8);
     }
 
     // 註冊
@@ -68,7 +79,6 @@ public class UserService {
         currentUser.setLastName(updatedUserDetails.getLastName());
         currentUser.setEmail(updatedUserDetails.getEmail());
         currentUser.setPhoneNumber(updatedUserDetails.getPhoneNumber());
-        currentUser.setProfileImagePath(updatedUserDetails.getProfileImagePath());
 
         userRepository.save(currentUser);
     }
@@ -86,5 +96,29 @@ public class UserService {
                     .orElse(null); // 更安全地處理空值
         }
         return null;
+    }
+
+    // 上傳用戶頭像
+    public void updateUserProfileImage(Long userId, MultipartFile file) throws IOException {
+        User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("Invalid user Id:" + userId));
+        String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename(); // 為了避免文件名衝突，可以加上當前時間戳
+        Path path = Paths.get(UPLOAD_DIR).resolve(fileName); // 確保使用resolve來連接路徑
+        Files.createDirectories(path.getParent());
+        Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING); // 使用copy替代write來處理文件流
+
+        // 根據 ResourceHandler 設置的訪問路徑，給前端使用
+        String webPath = "/profileImg/" + fileName;
+        user.setProfileImagePath(webPath);
+        userRepository.save(user); // 更新用户记录
+    }
+
+    // hashId
+    public String encode(Long id) {
+        return hashids.encode(id);
+    }
+
+    public Long decode(String hash) {
+        long[] ids = hashids.decode(hash);
+        return ids.length > 0 ? ids[0] : null;
     }
 }

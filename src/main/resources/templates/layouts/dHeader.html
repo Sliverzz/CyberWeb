@@ -31,6 +31,8 @@
             background-position: center center;
             background-attachment: fixed;
             background-repeat: no-repeat;
+            overflow-x: hidden;
+            overflow-y: hidden;
         }
 
         body::before {
@@ -79,6 +81,7 @@
     <!-- Nepcha Analytics (nepcha.com) -->
     <!-- Nepcha is a easy-to-use web analytics. No cookies and fully compliant with GDPR, CCPA and PECR. -->
     <script defer data-site="YOUR_DOMAIN_HERE" src="https://api.nepcha.com/js/nepcha-analytics.js"></script>
+    <!-- swl2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
@@ -131,7 +134,7 @@
 </aside>
 <main class="main-content position-relative max-height-vh-100 h-100 border-radius-lg ">
     <!-- Navbar -->
-    <nav class="navbar navbar-main navbar-expand-lg px-0 mx-4 shadow-none border-radius-xl" id="navbarBlur" data-scroll="true">
+    <nav class="navbar navbar-main navbar-expand-lg px-0 mx-4 shadow-none border-radius-xl" id="navbarBlur">
         <div class="container-fluid py-1 px-3">
             <nav aria-label="breadcrumb">
                 <h6 class="font-weight-bolder mb-0" style="color: #faecff; font-size: 20px;">主控台</h6>

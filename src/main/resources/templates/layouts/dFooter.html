@@ -24,24 +24,27 @@
 <!--   Core JS Files   -->
 <script src="/assets/js/core/popper.min.js"></script>
 <script src="/assets/js/core/bootstrap.min.js"></script>
-<script src="/assets/js/plugins/perfect-scrollbar.min.js"></script>
-<script src="/assets/js/plugins/smooth-scrollbar.min.js"></script>
 <script src="/assets/js/plugins/chartjs.min.js"></script>
-<!-- Control Center for Material Dashboard: parallax effects, scripts for the example pages etc-->
-<script src="/assets/js/material-dashboard.min.js?v=3.1.0"></script>
 <!-- AJAX -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <!-- Validate -->
 <script src="https://ajax.aspnetcdn.com/ajax/jquery.validate/1.19.3/jquery.validate.js"></script>
 
-        <script>
-            var win = navigator.platform.indexOf('Win') > -1;
-            if (win && document.querySelector('#sidenav-scrollbar')) {
-                var options = {
-                    damping: '0.5'
-                }
-                Scrollbar.init(document.querySelector('#sidenav-scrollbar'), options);
-            }
+<!-- 暫時用不到scroll、material -->
+<!--<script src="/assets/js/plugins/perfect-scrollbar.min.js"></script>-->
+<!--<script src="/assets/js/plugins/smooth-scrollbar.min.js"></script>-->
+<!--<script src="/assets/js/material-dashboard.min.js?v=3.1.0"></script>-->
+
+        <script th:inline="javascript">
+
+            // 暫時用不到scroll
+            // var win = navigator.platform.indexOf('Win') > -1;
+            // if (win && document.querySelector('#sidenav-scrollbar')) {
+            //     var options = {
+            //         damping: '0.5'
+            //     }
+            //     Scrollbar.init(document.querySelector('#sidenav-scrollbar'), options);
+            // }
 
             // Sidebar 導航 active
             document.addEventListener("DOMContentLoaded", function() {
