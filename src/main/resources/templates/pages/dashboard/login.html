@@ -45,22 +45,35 @@
       /* 應用動畫到錯誤消息容器 */
       .custom-error-message {
           animation: microShake 0.5s ease-in-out;
-          background-color: #f8d7da; /* 粉紅色背景 */
+          background-color: #f8d7da;
           text-align: center;
-          color: #721c24; /* 深紅色文字 */
-          border-color: #f5c6cb; /* 邊框顏色 */
-          border-radius: .50rem; /* 圓角邊框 */
-          padding: .40rem 1rem; /* 內邊距 */
-          margin-bottom: 0.5rem; /* 下邊距 */
-          border: 1px solid transparent; /* 透明邊框 */
-          display: block; /* 使div塊級顯示 */
-          width: 100%; /* 寬度100% */
-          box-sizing: border-box; /* 盒模型設定 */
+          color: #721c24;
+          border-color: #f5c6cb;
+          border-radius: .50rem;
+          padding: .40rem 1rem;
+          margin-bottom: 0.5rem;
+          border: 1px solid transparent;
+          display: block;
+          width: 100%;
+          box-sizing: border-box;
       }
+
+      .back-to-previous-page {
+          position: absolute;
+          top: 20px;
+          left: 20px;
+          font-size: 24px;
+          color: #fff;
+          z-index: 1000;
+      }
+
   </style>
 </head>
 
 <body class="bg-gray-200" data-flash-message="[[${flashMessage}]]">
+<a href="javascript:history.back()" class="back-to-previous-page">
+    <i class="fas fa-arrow-left"></i>
+</a>
   <main class="main-content  mt-0">
     <div class="page-header align-items-start min-vh-100" style="background-image: url('/assets/img/cyber-web-wallpaper.jpg');">
       <span class="mask bg-gradient-dark opacity-6"></span>

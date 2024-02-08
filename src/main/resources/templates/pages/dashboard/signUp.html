@@ -27,23 +27,35 @@
     <style>
         /*Validate css*/
         .feedback-message {
-            display: block; /* 確保它是塊級元素，這樣就會出現在新行 */
-            font-size: 0.8rem; /* 可以根據需要調整字體大小 */
-            margin-top: 5px; /* 與輸入框之間的間隙 */
+            display: block;
+            font-size: 0.8rem;
+            margin-top: 5px;
         }
 
         .invalid-feedback {
-            color: red; /* 錯誤訊息顯示紅色 */
+            color: red;
         }
 
         .valid-feedback {
             color: green; /* 正確訊息顯示綠色 */
         }
 
+        .back-to-previous-page {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-size: 24px;
+            color: #fff;
+            z-index: 1000;
+        }
+
     </style>
 </head>
 
 <body class="bg-gray-200" data-flash-message="[[${flashMessage}]]">
+<a href="javascript:history.back()" class="back-to-previous-page">
+    <i class="fas fa-arrow-left"></i>
+</a>
 <main class="main-content  mt-0">
     <div class="page-header align-items-start min-vh-100" style="background-image: url('/assets/img/cyber-web-wallpaper.jpg');">
         <span class="mask bg-gradient-dark opacity-6"></span>
