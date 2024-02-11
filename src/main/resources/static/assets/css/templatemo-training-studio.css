@@ -1251,6 +1251,7 @@ responsive
 .cyberpunk-btn {
     background: linear-gradient(45deg, #ff00cc, #333399);
     color: #ffffff;
+    width: 100%;
     border: none;
     cursor: pointer;
     font-family: 'Roboto', sans-serif;

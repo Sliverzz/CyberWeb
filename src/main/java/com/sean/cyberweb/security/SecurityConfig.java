@@ -45,7 +45,7 @@ public class SecurityConfig {
                 .formLogin(form -> form
                         .loginPage("/dashboard/login") // 自定義登入頁面
                         .loginProcessingUrl("/login") //登入url
-                        .defaultSuccessUrl("/dashboard/index", true) // 登入成功後的導向
+                        .defaultSuccessUrl("/site/index", true) // 登入成功後的導向
                         .permitAll() // 允許所有用戶訪問登入頁面
                 )
                 .logout(logout -> logout

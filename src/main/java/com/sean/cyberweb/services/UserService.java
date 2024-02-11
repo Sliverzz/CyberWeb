@@ -1,5 +1,6 @@
 package com.sean.cyberweb.services;
 
+import com.sean.cyberweb.domain.Role;
 import org.hashids.Hashids;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -41,6 +42,11 @@ public class UserService {
         if (userRepository.existsByUsername(user.getUsername()) || userRepository.existsByEmail(user.getEmail())) {
             // 已存在返回false
             return false;
+        }
+
+        // 前端傳過來的role值為空就寫入ROLE_USER
+        if (user.getRole() == null || user.getRole().isEmpty()) {
+            user.setRole(Role.ROLE_USER);
         }
 
         // 加密使用者密碼

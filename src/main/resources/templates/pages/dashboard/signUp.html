@@ -86,7 +86,7 @@
                                 </div>
 
                                 <!-- 個人資料區 -->
-                                <div>
+                                <div class="mb-4">
                                     <h5 class="mb-3">Personal Information</h5>
                                     <div class="input-group input-group-outline mb-3">
                                         <input type="text" class="form-control" placeholder="First Name" name="firstName" required>
@@ -99,7 +99,14 @@
                                     </div>
                                 </div>
 
-                                <!-- 條款同意 -->
+                                <!-- 權限 -->
+                                <div class="form-check form-check-info text-start ps-0">
+                                    <input class="form-check-input" type="checkbox" value="ROLE_ADMIN" id="adminRoleCheckbox" name="role">
+                                    <label class="form-check-label" for="adminRoleCheckbox">
+                                        Register as Admin
+                                    </label>
+                                </div>
+                                <!-- 條款 -->
                                 <div class="form-check form-check-info text-start ps-0">
                                     <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault" required>
                                     <label class="form-check-label" for="flexCheckDefault">

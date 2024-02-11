@@ -8,6 +8,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -45,9 +47,8 @@ public class User {
     @Column(name = "date_created", nullable = false)
     private LocalDateTime dateCreated = LocalDateTime.now(); // 帳戶創建時間
 
-    //    暫時不需要role，需要再開。
-    //    @Column(name = "role", nullable = false)
-    //    private String role;
+    @Column(name = "role", nullable = false)
+    private String role;
 
     @Column(name = "profile_image_path")
     private String profileImagePath;

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
 
 <head>
 
@@ -22,6 +23,56 @@
     <script src="https://kit.fontawesome.com/0a9f356c66.js" crossorigin="anonymous"></script>
 
     <style>
+        /* Dropdown Button */
+        .dropBtn {
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease; /* 為按鈕添加背景顏色變化的過渡效果 */
+        }
+
+        /* 容器 <li> - 需要定位dropdown content */
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        /* Dropdown Content (隱藏的默認) */
+        .dropdown-content {
+            visibility: hidden; /* 初始設為不可見 */
+            opacity: 0; /* 初始透明度為0 */
+            position: absolute;
+            width: 100%;
+            border-radius: 10px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            z-index: 1;
+            transition: visibility 0s, opacity 0.5s linear, transform 0.5s ease-out; /* 添加淡入效果和向下滑動的過渡效果 */
+            transform: translateY(-20px); /* 初始向上移動，使得淡入時有向下滑動的效果 */
+            max-height: 0; /* 初始最大高度為0 */
+            overflow: hidden;
+        }
+
+        /* Dropdown Links */
+        .dropdown-content form {
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+        }
+
+        /* 顯示dropdown content當滑鼠懸停在dropdown button上 */
+        .dropdown:hover .dropdown-content {
+            visibility: visible;
+            opacity: 1; /* 滑鼠懸停時透明度變為1 */
+            transform: translateY(0); /* 滑鼠懸停時移回原位 */
+            max-height: 500px; /* 設置一個足夠大的最大高度以適應內容 */
+            transition-delay: 0s, 0s, 0s; /* 確保visibility的變化不會延遲 */
+        }
+
+        /* 按鈕和連結的樣式 */
+        .cyberpunk-btn {
+            border: none;
+            cursor: pointer;
+        }
+
 
     </style>
 
@@ -50,7 +101,7 @@
             <div class="col-12">
                 <nav class="main-nav">
                     <!-- ***** Logo Start ***** -->
-                    <a href="index.html" class="logo">Cyber<em style="color: #ff6eec">Web</em></a>
+                    <a href="/site/index" class="logo">Cyber<em style="color: #ff6eec">Web</em></a>
                     <!-- ***** Logo End ***** -->
                     <!-- ***** Menu Start ***** -->
                     <ul class="nav">
@@ -58,8 +109,26 @@
                         <li class="scroll-to-section"><a href="#features"><i class="fa-solid fa-lightbulb"></i> About</a></li>
                         <li class="scroll-to-section"><a href=""><i class="fa-solid fa-gun"></i> Gun</a></li>
                         <li class="scroll-to-section"><a href=""><i class="fa-solid fa-cart-shopping"></i> Cart</a></li>
-                        <li class="main-button">
-                            <button id="cyberpunkButton" class="cyberpunk-btn">Login</button>
+                        <!-- 如果用戶未登入，顯示登入按鈕 -->
+                        <li class="main-button" sec:authorize="!isAuthenticated()">
+                            <form action="/dashboard/login" method="get">
+                                <button type="submit" class="cyberpunk-btn">Login</button>
+                            </form>
+                        </li>
+                        <!-- 登入後顯示的部分 -->
+                        <li class="main-button dropdown" sec:authorize="isAuthenticated()">
+                            <button class="cyberpunk-btn dropBtn">歡迎, <span sec:authentication="name">使用者</span></button>
+                            <div class="dropdown-content">
+                                <form action="" method="get">
+                                    <button type="submit" class="cyberpunk-btn">會員中心</button>
+                                </form>
+                                <form action="/dashboard/index" method="get" sec:authorize="hasAuthority('ROLE_ADMIN')">
+                                    <button type="submit" class="cyberpunk-btn">後台管理</button>
+                                </form>
+                                <form action="/logout" method="post">
+                                    <button type="submit" class="cyberpunk-btn">Logout</button>
+                                </form>
+                            </div>
                         </li>
                     </ul>
                     <a class='menu-trigger'>
@@ -208,9 +277,7 @@
 <script src="/assets/js/custom.js"></script>
 
 <script>
-    document.getElementById('cyberpunkButton').addEventListener('click', function() {
-        window.location.href = '/dashboard/login';
-    });
+
 </script>
 
 </body>
