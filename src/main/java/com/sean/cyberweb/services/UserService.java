@@ -25,7 +25,8 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
-    private static final String UPLOAD_DIR = "C:\\Users\\ML2\\Desktop\\Cyber Web\\Img\\avatar";
+//    private static final String UPLOAD_DIR = "C:\\Users\\ML2\\Desktop\\Cyber Web\\Img\\"; //PC
+    private static final String UPLOAD_DIR = "/Users/ml2_oao/Desktop/CyberWeb/Img"; //Mac
     private final Hashids hashids;
 
     @Autowired

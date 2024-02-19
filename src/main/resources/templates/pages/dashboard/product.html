@@ -7,7 +7,54 @@
 </head>
 <body>
 <div th:replace="~{layouts/dHeader :: body}"></div>
-
+<!-- Datatables產品表格 -->
+<div class="container rounded bg-white mt-5 mb-5">
+    <table id="productTable" class="display" style="width:100%">
+        <thead>
+        <tr>
+            <th>產品名稱</th>
+            <th>描述</th>
+            <th>價格</th>
+            <th>庫存</th>
+            <th>操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        <!-- 數據將由Datatables動態加載 -->
+        </tbody>
+    </table>
+</div>
 <div th:replace="~{layouts/dFooter :: body}"></div>
+
+<!-- 在這裡引入Datatables的JS -->
+<script src="//cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $('#productTable').DataTable({
+            "processing": true,
+            "serverSide": true,
+            "ajax": {
+                "url": "/product/list",
+                "type": "GET"
+            },
+            "columns": [
+                {"data": "name"},
+                {"data": "description"},
+                {"data": "price"},
+                {"data": "stock"},
+                {
+                    "data": "id",
+                    "render": function (data, type, row, meta) {
+                        return '<button class="btn btn-primary profile-button">編輯</button>' +
+                               '<button class="btn btn-danger profile-button">刪除</button>';
+                    }
+                }
+            ],
+            "language": {
+                "url": "//cdn.datatables.net/plug-ins/1.11.3/i18n/zh_Hant.json" // 中文化
+            }
+        });
+    });
+</script>
 </body>
 </html>
