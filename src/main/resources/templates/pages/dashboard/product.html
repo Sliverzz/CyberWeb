@@ -7,6 +7,13 @@
 </head>
 <body>
 <div th:replace="~{layouts/dHeader :: body}"></div>
+
+<div class="container mt-3">
+    <button type="button" class="btn btn-primary profile-button" data-bs-toggle="modal" data-bs-target="#addProductModal">
+        Add New
+    </button>
+</div>
+
 <!-- Datatables產品表格 -->
 <div class="container rounded bg-white mt-5 mb-5">
     <table id="productTable" class="display" style="width:100%">
@@ -20,14 +27,102 @@
         </tr>
         </thead>
         <tbody>
-        <!-- 數據將由Datatables動態加載 -->
+        <!-- 數據由Datatables動態加載 -->
         </tbody>
     </table>
 </div>
+
+<!-- 新增商品的Modal -->
+<div class="modal fade" id="addProductModal" tabindex="-1" aria-labelledby="addProductModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addProductModalLabel">新增商品</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form role="form" id="addProductForm" th:action="@{/product/create}" th:method="post" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label for="productName" class="form-label">產品名稱</label>
+                        <input type="text" class="form-control" id="productName" name="name" style="border: 1px solid #ced4da !important; border-radius: 0.25rem !important; padding: 10px;" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="productDescription" class="form-label">描述</label>
+                        <input class="form-control" id="productDescription" name="description" style="border: 1px solid #ced4da !important; border-radius: 0.25rem !important; padding: 10px;" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="productPrice" class="form-label">價格</label>
+                        <input type="number" class="form-control" id="productPrice" name="price" min="0" max="1000000" style="border: 1px solid #ced4da !important; border-radius: 0.25rem !important; padding: 10px;" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="productStock" class="form-label">庫存</label>
+                        <input type="number" class="form-control" id="productStock" name="stock" min="0" max="500" style="border: 1px solid #ced4da !important; border-radius: 0.25rem !important; padding: 10px;" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="productImage" class="form-label">產品圖片</label>
+                        <input type="file" class="form-control" id="productImage" name="productImage" accept="image/*" style="border: 1px solid #ced4da !important; border-radius: 0.25rem !important; padding: 10px;" required>
+                    </div>
+                    <!-- 圖片預覽 -->
+                    <div class="mb-3">
+                        <img id="imagePreview" src="#" alt="圖片預覽" style="max-width: 100%; display: none;">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" data-bs-dismiss="modal" style="background-color: #1968ff">取消</button>
+                        <button type="submit" class="btn btn-primary" id="saveProduct">儲存商品</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 編輯商品的Modal -->
+<div class="modal fade" id="editProductModal" tabindex="-1" aria-labelledby="editProductModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editProductModalLabel">編輯商品</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editProductForm" th:action="@{/product/update}" th:method="post" enctype="multipart/form-data">
+                    <input type="hidden" id="editProductId" name="id">
+                    <div class="mb-3">
+                        <label for="editProductName" class="form-label">產品名稱</label>
+                        <input type="text" class="form-control" id="editProductName" name="name" style="border: 1px solid #ced4da !important; border-radius: 0.25rem !important; padding: 10px;" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editProductDescription" class="form-label">描述</label>
+                        <input type="text" class="form-control" id="editProductDescription" name="description" style="border: 1px solid #ced4da !important; border-radius: 0.25rem !important; padding: 10px;" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editProductPrice" class="form-label">價格</label>
+                        <input type="number" class="form-control" id="editProductPrice" name="price" min="0" max="1000000" style="border: 1px solid #ced4da; border-radius: 0.25rem; padding: 10px;" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editProductStock" class="form-label">庫存</label>
+                        <input type="number" class="form-control" id="editProductStock" name="stock" min="0" max="500" style="border: 1px solid #ced4da; border-radius: 0.25rem; padding: 10px;" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editProductImage" class="form-label">圖片</label>
+                        <input type="file" class="form-control" id="editProductImage" name="productImage" style="border: 1px solid #ced4da !important; border-radius: 0.25rem !important; padding: 10px;">
+                        <!-- 圖片預覽區域 -->
+                        <img id="productImagePreview" src="#" alt="Product Image Preview" style="display:none; max-width: 100%; height: auto;">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" data-bs-dismiss="modal" style="background-color: #1968ff">取消</button>
+                        <button type="submit" class="btn btn-primary">保存</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div th:replace="~{layouts/dFooter :: body}"></div>
 
-<!-- 在這裡引入Datatables的JS -->
-<script src="//cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
+<!-- datatable -->
+<script src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
 <script>
     $(document).ready(function () {
         $('#productTable').DataTable({
@@ -37,6 +132,11 @@
                 "url": "/product/list",
                 "type": "GET"
             },
+            "pageLength": 5,
+            "lengthMenu": [ [5, 10, 20, -1], [5, 10, 20, "所有"] ],
+            "scrollY": "400px",
+            "scrollCollapse": true,
+            "paging": true,
             "columns": [
                 {"data": "name"},
                 {"data": "description"},
@@ -45,16 +145,84 @@
                 {
                     "data": "id",
                     "render": function (data, type, row, meta) {
-                        return '<button class="btn btn-primary profile-button">編輯</button>' +
-                               '<button class="btn btn-danger profile-button">刪除</button>';
+                        return '<button class="btn btn-primary profile-button" style="margin-top: 15px" onclick="getProductInfo(' + data + ')">編輯</button>' + " " +
+                            '<button class="btn btn-danger profile-button" style="margin-top: 15px" onclick="deleteProduct(' + data + ')">刪除</button>';
                     }
                 }
             ],
             "language": {
-                "url": "//cdn.datatables.net/plug-ins/1.11.3/i18n/zh_Hant.json" // 中文化
+                "url": "//cdn.datatables.net/plug-ins/1.11.3/i18n/zh_Hant.json"
             }
         });
     });
+
+    // 編輯商品
+    function getProductInfo(id) {
+        $.get("/product/productInfo", { id: id })
+            .done(function(data) {
+                // 填充表單元素
+                $('#editProductId').val(data.id);
+                $('#editProductName').val(data.name);
+                $('#editProductDescription').val(data.description);
+                $('#editProductPrice').val(data.price);
+                $('#editProductStock').val(data.stock);
+
+                // 更新圖片顯示
+                if (data.productImagePath) {
+                    var fullUrl = data.productImagePath; // 根據實際路徑調整
+                    $('#productImagePreview').attr('src', fullUrl).show();
+                } else {
+                    // 沒有圖片時的處理
+                    $('#productImagePreview').hide();
+                }
+
+                // 顯示modal
+                $('#editProductModal').modal('show');
+            });
+    }
+
+
+    // 刪除商品
+    function deleteProduct(id) {
+        Swal.fire({
+            title: '確定要刪除嗎？',
+            text: "你將無法恢復此操作！",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            cancelButtonText: '取消',
+            confirmButtonText: '刪除'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // 在這裡發送AJAX請求到後端進行刪除
+                $.ajax({
+                    url: "/product/delete",
+                    type: "POST",
+                    data: { id: id },
+                    success: function(response) {
+                        // 刪除成功後的操作，比如重新加載表格
+                        $('#productTable').DataTable().ajax.reload();
+                        Swal.fire(
+                            '已刪除！',
+                            '商品已被刪除。',
+                            'success'
+                        );
+                    }
+                });
+            }
+        })
+    }
+
+    document.getElementById('productImage').onchange = function(event) {
+        var reader = new FileReader();
+        reader.onload = function() {
+            var output = document.getElementById('imagePreview');
+            output.src = reader.result;
+            output.style.display = 'block'; // 顯示圖片預覽
+        };
+        reader.readAsDataURL(event.target.files[0]);
+    };
 </script>
 </body>
 </html>

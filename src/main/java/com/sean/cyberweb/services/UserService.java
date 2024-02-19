@@ -25,8 +25,8 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
-//    private static final String UPLOAD_DIR = "C:\\Users\\ML2\\Desktop\\Cyber Web\\Img\\"; //PC
-    private static final String UPLOAD_DIR = "/Users/ml2_oao/Desktop/CyberWeb/Img"; //Mac
+    private static final String UPLOAD_DIR = "C:\\Users\\ML2\\Desktop\\CyberWeb\\Img\\"; //PC
+//    private static final String UPLOAD_DIR = "/Users/ml2_oao/Desktop/CyberWeb/Img"; //Mac
     private final Hashids hashids;
 
     @Autowired
@@ -114,9 +114,11 @@ public class UserService {
         Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING); // 使用copy替代write來處理文件流
 
         // 根據 ResourceHandler 設置的訪問路徑，給前端使用
-        String webPath = "/profileImg/" + fileName;
+        String webPath = "/img/" + fileName;
         user.setProfileImagePath(webPath);
-        userRepository.save(user); // 更新用户记录
+
+        // 儲存
+        userRepository.save(user);
     }
 
     // hashId
