@@ -75,27 +75,6 @@ public class DashboardController {
         return "/pages/dashboard/profile";
     }
 
-    // 商品管理
-//    @GetMapping("/product")
-//    public String product(@RequestParam(value = "id", required = false) Long productId, Model model) {
-//        User currentUser = userService.getCurrentUser();
-//        Product product = productService.findProductById(productId);
-//
-//        String userHashId = userService.encode(currentUser.getId());
-//        String productImagePath = "/assets/img/no-image.jpg";
-//
-//        if (product != null && product.hasProductImgUrl() && product.getProductImgUrl() != null && !product.getProductImgUrl().isEmpty()) {
-//            productImagePath = product.getProductImgUrl();
-//        }
-//
-//        model.addAttribute("userHashId", userHashId);
-//        model.addAttribute("user", currentUser);
-//        model.addAttribute("product", product);
-//        model.addAttribute("productImagePath", productImagePath);
-//
-//        return "/pages/dashboard/product";
-//    }
-
     @GetMapping("/product")
     public String product(Model model) {
         User currentUser = userService.getCurrentUser();

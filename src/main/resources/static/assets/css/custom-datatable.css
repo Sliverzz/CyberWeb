@@ -1,0 +1,41 @@
+.dataTables_wrapper .dataTables_paginate .paginate_button {
+    margin-right: 10px; /* 調整按鈕之間的距離 */
+    cursor: pointer;
+}
+
+/* 改變 DataTables 的每頁顯示數量選擇器樣式 */
+.dataTables_length select {
+    padding: 5px 10px;
+    border: 1px solid #ddd; /* 設置邊框顏色 */
+    border-radius: 4px; /* 設置邊框圓角 */
+    background-color: white;
+    box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1); /* 輕微的陰影效果 */
+    margin: 0 5px; /* 讓 'entries' 前後各有 5px 的空間 */
+}
+
+/* 改變 DataTables 的搜索框樣式 */
+.dataTables_filter input {
+    padding: 5px 10px;
+    border: 1px solid #ddd; /* 設置邊框顏色 */
+    border-radius: 4px; /* 設置邊框圓角 */
+    margin-left: 10px; /* 設置與前面標籤的間距 */
+    box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1); /* 輕微的陰影效果 */
+}
+
+.dataTables_length::before {
+    content: " "; /* 在 'Show' 和 '<select>' 之间添加空格 */
+}
+
+/* 調整 DataTables 控件的對齊 */
+.dataTables_length label,
+.dataTables_filter label {
+    display: flex;
+    align-items: center;
+}
+
+/* 當輸入框獲得焦點時的樣式 */
+.dataTables_filter input:focus {
+    outline: none;
+    border-color: #66afe9; /* 焦點時的邊框顏色 */
+    box-shadow: 0 0 8px rgba(102, 175, 233, 0.6); /* 焦點時的陰影效果 */
+}

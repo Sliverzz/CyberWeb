@@ -29,6 +29,10 @@ public class ProductService {
         return productRepository.findAll(pageRequest);
     }
 
+    public Page<Product> findByNameContainingIgnoreCase(String name, PageRequest pageRequest) {
+        return productRepository.findByNameContainingIgnoreCase(name, pageRequest);
+    }
+
     public Product findProductById(Long productId) {
         return productRepository.findById(productId).orElse(null);
     }

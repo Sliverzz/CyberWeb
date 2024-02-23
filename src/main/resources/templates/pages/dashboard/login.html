@@ -98,7 +98,7 @@
                       <input class="form-check-input" type="checkbox" id="rememberMe" name="remember-me">
                       <label class="form-check-label" for="rememberMe">&nbspRemember me</label>
                   </div>
-                    <!-- 檢查URL中是否有登入錯誤訊息，有就顯示帳號或密碼錯誤 -->
+                    <!-- 檢查URL中是否有登入錯誤訊息，有就下方提示帳號或密碼錯誤 -->
                     <div th:if="${param.error}" class="alert alert-warning custom-error-message" role="alert">
                         Username or password is incorrect.
                     </div>

@@ -5,6 +5,7 @@ import com.sean.cyberweb.services.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,13 +33,15 @@ public class ProductController {
     }
 
     @GetMapping("/list")
-    @ResponseBody
-    public Map<String, Object> listProducts(
-            @RequestParam("draw") int draw,
-            @RequestParam("start") int start,
-            @RequestParam("length") int length) {
-        PageRequest pageRequest = PageRequest.of(start / length, length);
-        Page<Product> productPage = productService.findAll(pageRequest);
+    public ResponseEntity<Map<String, Object>> listProducts(@RequestParam("draw") int draw,
+                                                            @RequestParam("start") int start,
+                                                            @RequestParam("length") int length,
+                                                            @RequestParam(value = "search[value]", defaultValue = "") String searchValue) {
+        int pageSize = length == -1 ? Integer.MAX_VALUE : length;
+        PageRequest pageRequest = PageRequest.of(start / pageSize, pageSize);
+        Page<Product> productPage = searchValue.isEmpty() ?
+                productService.findAll(pageRequest) :
+                productService.findByNameContainingIgnoreCase(searchValue, pageRequest);
 
         Map<String, Object> data = new HashMap<>();
         data.put("draw", draw);
@@ -46,8 +49,9 @@ public class ProductController {
         data.put("recordsFiltered", productPage.getTotalElements());
         data.put("data", productPage.getContent());
 
-        return data;
+        return ResponseEntity.ok(data);
     }
+
 
     @PostMapping("/create")
     public String createProduct(@ModelAttribute Product product, @RequestParam(value = "productImage") MultipartFile file, RedirectAttributes redirectAttributes) {
@@ -73,6 +77,13 @@ public class ProductController {
     @ResponseBody
     public Product productInfo(@RequestParam("id") Long id) {
         return productService.findProductById(id);
+    }
+
+    @GetMapping("/fetchProducts")
+    public ResponseEntity<Page<Product>> listProducts(@RequestParam(value = "page", defaultValue = "0") int page,
+                                                      @RequestParam(value = "size", defaultValue = "10") int size) {
+        Page<Product> products = productService.findAll(PageRequest.of(page, size));
+        return ResponseEntity.ok(products);
     }
 
     @PostMapping("/update")

@@ -1,5 +1,6 @@
 package com.sean.cyberweb.domain;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -33,18 +34,10 @@ public class Product {
     private Integer stock; // 庫存數量
 
     @Column(name = "product_image_path")
-    private String productImagePath; // 產品圖片
+    private String productImagePath; // 產品圖片位址
 
     public boolean hasProductImgUrl() {
         return productImagePath != null && !productImagePath.isEmpty();
-    }
-
-    public String getProductImgUrl() {
-        if (hasProductImgUrl()) {
-            return productImagePath;
-        } else {
-            return "/assets/img/no-image.jpg";
-        }
     }
 
     @CreationTimestamp

@@ -10,6 +10,7 @@
     <meta name="author" content="">
     <link href="https://fonts.googleapis.com/css?family=Poppins:100,100i,200,200i,300,300i,400,400i,500,500i,600,600i,700,700i,800,800i,900,900i&display=swap" rel="stylesheet">
     <link rel="icon" type="image/png" href="/assets/img/logos/cyber-web-logo.png">
+    <link rel="stylesheet" type="text/css" href="/assets/css/product.css" />
     <title>CyberWeb</title>
 
     <!-- Additional CSS Files -->
@@ -27,7 +28,7 @@
         .dropBtn {
             border: none;
             cursor: pointer;
-            transition: background-color 0.3s ease; /* 為按鈕添加背景顏色變化的過渡效果 */
+            transition: background-color 0.3s ease;
         }
 
         /* 容器 <li> - 需要定位dropdown content */
@@ -38,16 +39,16 @@
 
         /* Dropdown Content (隱藏的默認) */
         .dropdown-content {
-            visibility: hidden; /* 初始設為不可見 */
-            opacity: 0; /* 初始透明度為0 */
+            visibility: hidden;
+            opacity: 0;
             position: absolute;
             width: 100%;
             border-radius: 10px;
             box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
             z-index: 1;
-            transition: visibility 0s, opacity 0.5s linear, transform 0.5s ease-out; /* 添加淡入效果和向下滑動的過渡效果 */
-            transform: translateY(-20px); /* 初始向上移動，使得淡入時有向下滑動的效果 */
-            max-height: 0; /* 初始最大高度為0 */
+            transition: visibility 0s, opacity 0.5s linear, transform 0.5s ease-out;
+            transform: translateY(-20px);
+            max-height: 0;
             overflow: hidden;
         }
 
@@ -61,10 +62,10 @@
         /* 顯示dropdown content當滑鼠懸停在dropdown button上 */
         .dropdown:hover .dropdown-content {
             visibility: visible;
-            opacity: 1; /* 滑鼠懸停時透明度變為1 */
-            transform: translateY(0); /* 滑鼠懸停時移回原位 */
-            max-height: 500px; /* 設置一個足夠大的最大高度以適應內容 */
-            transition-delay: 0s, 0s, 0s; /* 確保visibility的變化不會延遲 */
+            opacity: 1;
+            transform: translateY(0);
+            max-height: 500px;
+            transition-delay: 0s, 0s, 0s;
         }
 
         /* 按鈕和連結的樣式 */
@@ -106,8 +107,7 @@
                     <!-- ***** Menu Start ***** -->
                     <ul class="nav">
                         <li class="scroll-to-section"><a href="#top" style=""><i class="fa-solid fa-house"></i> Home</a></li>
-                        <li class="scroll-to-section"><a href="#features"><i class="fa-solid fa-lightbulb"></i> About</a></li>
-                        <li class="scroll-to-section"><a href=""><i class="fa-solid fa-gun"></i> Gun</a></li>
+                        <li class="scroll-to-section"><a href="#features"><i class="fa-solid fa-gun"></i> Gun</a></li>
                         <li class="scroll-to-section"><a href=""><i class="fa-solid fa-cart-shopping"></i> Cart</a></li>
                         <!-- 如果用戶未登入，顯示登入按鈕 -->
                         <li class="main-button" sec:authorize="!isAuthenticated()">
@@ -117,13 +117,13 @@
                         </li>
                         <!-- 登入後顯示的部分 -->
                         <li class="main-button dropdown" sec:authorize="isAuthenticated()">
-                            <button class="cyberpunk-btn dropBtn">歡迎, <span sec:authentication="name">使用者</span></button>
+                            <button class="cyberpunk-btn dropBtn">Welcome, <span sec:authentication="name">User</span></button>
                             <div class="dropdown-content">
                                 <form action="" method="get">
-                                    <button type="submit" class="cyberpunk-btn">會員中心</button>
+                                    <button type="submit" class="cyberpunk-btn">Member</button>
                                 </form>
                                 <form action="/dashboard/index" method="get" sec:authorize="hasAuthority('ROLE_ADMIN')">
-                                    <button type="submit" class="cyberpunk-btn">後台管理</button>
+                                    <button type="submit" class="cyberpunk-btn">Dashboard</button>
                                 </form>
                                 <form action="/logout" method="post">
                                     <button type="submit" class="cyberpunk-btn">Logout</button>
@@ -145,7 +145,7 @@
 <!-- ***** Main Banner Area Start ***** -->
 <div class="main-banner" id="top">
     <video autoplay muted loop id="bg-video">
-        <source src="/assets/images/Cyberpunk_EdgeRunners_1080p.mp4" type="video/mp4" />
+        <source src="/assets/img/Cyberpunk_EdgeRunners_1080p.mp4" type="video/mp4" />
     </video>
 
     <div class="video-overlay header-text">
@@ -161,83 +161,19 @@
 <!-- ***** Main Banner Area End ***** -->
 
 <!-- ***** Features Item Start ***** -->
-<section class="section" id="features">
+<section class="section" id="features">>
     <div class="container">
         <div class="row">
             <div class="col-lg-6 offset-lg-3">
                 <div class="section-heading">
-                    <h2>Cyber<em style="color: #ff6eec">Web</em></h2>
-                    <img src="/assets/images/line-dec.png" alt="waves">
+                    <img src="/assets/img/cyberpunk-2077-logo.png" style="width: 100%; height: 100%" alt="waves">
                     <p>Here you can buy guns from the game "Cyberpunk 2077", that's all.</p>
                 </div>
             </div>
-            <div class="col-lg-6">
-                <ul class="features-items">
-                    <li class="feature-item">
-                        <div class="left-icon">
-                            <img src="/assets/images/features-first-icon.png" alt="First One">
-                        </div>
-                        <div class="right-content">
-                            <h4>Basic Fitness</h4>
-                            <p>Please do not re-distribute this template ZIP file on any template collection website. This is not allowed.</p>
-                            <a href="#" class="text-button">Discover More</a>
-                        </div>
-                    </li>
-                    <li class="feature-item">
-                        <div class="left-icon">
-                            <img src="/assets/images/features-first-icon.png" alt="second one">
-                        </div>
-                        <div class="right-content">
-                            <h4>New Gym Training</h4>
-                            <p>If you wish to support TemplateMo website via PayPal, please feel free to contact us. We appreciate it a lot.</p>
-                            <a href="#" class="text-button">Discover More</a>
-                        </div>
-                    </li>
-                    <li class="feature-item">
-                        <div class="left-icon">
-                            <img src="/assets/images/features-first-icon.png" alt="third gym training">
-                        </div>
-                        <div class="right-content">
-                            <h4>Basic Muscle Course</h4>
-                            <p>Credit goes to <a rel="nofollow" href="https://www.pexels.com" target="_blank">Pexels website</a> for images and video background used in this HTML template.</p>
-                            <a href="#" class="text-button">Discover More</a>
-                        </div>
-                    </li>
-                </ul>
-            </div>
-            <div class="col-lg-6">
-                <ul class="features-items">
-                    <li class="feature-item">
-                        <div class="left-icon">
-                            <img src="/assets/images/features-first-icon.png" alt="fourth muscle">
-                        </div>
-                        <div class="right-content">
-                            <h4>Advanced Muscle Course</h4>
-                            <p>You may want to browse through <a rel="nofollow" href="https://templatemo.com/tag/digital-marketing" target="_parent">Digital Marketing</a> or <a href="https://templatemo.com/tag/corporate">Corporate</a> HTML CSS templates on our website.</p>
-                            <a href="#" class="text-button">Discover More</a>
-                        </div>
-                    </li>
-                    <li class="feature-item">
-                        <div class="left-icon">
-                            <img src="/assets/images/features-first-icon.png" alt="training fifth">
-                        </div>
-                        <div class="right-content">
-                            <h4>Yoga Training</h4>
-                            <p>This template is built on Bootstrap v4.3.1 framework. It is easy to adapt the columns and sections.</p>
-                            <a href="#" class="text-button">Discover More</a>
-                        </div>
-                    </li>
-                    <li class="feature-item">
-                        <div class="left-icon">
-                            <img src="/assets/images/features-first-icon.png" alt="gym training">
-                        </div>
-                        <div class="right-content">
-                            <h4>Body Building Course</h4>
-                            <p>Suspendisse fringilla et nisi et mattis. Curabitur sed finibus nisi. Integer nibh sapien, vehicula et auctor.</p>
-                            <a href="#" class="text-button">Discover More</a>
-                        </div>
-                    </li>
-                </ul>
+            <div class="col-lg-6" id="productContainer">
+                <div class="row" id="productRow">
+                    <!-- AJAX動態加載的產品將顯示在這裡 -->
+                </div>
             </div>
         </div>
     </div>
@@ -277,7 +213,49 @@
 <script src="/assets/js/custom.js"></script>
 
 <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        fetchProducts();
+    });
 
+    function fetchProducts() {
+        fetch('/product/fetchProducts')
+            .then(response => response.json())
+            .then(data => {
+                const products = data.content; // 假設產品數據在 `content` 屬性中
+                const productRow = document.getElementById('productRow');
+                let newRow = productRow; // 初始化為現有的行
+
+                products.forEach((product, index) => {
+                    // 每三個產品換行的邏輯
+                    if (index % 3 === 0) {
+                        newRow = document.createElement('div');
+                        newRow.className = 'row';
+                        productRow.parentNode.appendChild(newRow);
+                    }
+
+                    const colDiv = document.createElement('div');
+                    colDiv.className = 'col-lg-4';
+                    colDiv.innerHTML = `
+                <ul class="features-items">
+                    <li class="feature-item">
+                        <div class="card">
+                            <div class="imgBox">
+                                <img src="${product.productImagePath}" alt="${product.name}" class="mouse">
+                            </div>
+                            <div class="contentBox">
+                                <h3>${product.name}</h3>
+                                <h2 class="price">${product.price} €</h2>
+                                <a href="#" class="buy">Buy Now</a>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            `;
+                    newRow.appendChild(colDiv); // 將新的產品列添加到當前行
+                });
+            })
+            .catch(error => console.error('Error fetching products:', error));
+    }
 </script>
 
 </body>

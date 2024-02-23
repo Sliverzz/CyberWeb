@@ -115,8 +115,9 @@ global styles
 */
 html,
 body {
-  background: #fff;
-  font-family: 'Poppins', sans-serif;
+    font-family: 'Poppins', sans-serif;
+    background-size: cover;
+    background: #1a2035;
 }
 
 ::selection {
@@ -147,8 +148,8 @@ body {
 
 .section-heading {
   text-align: center;
-  margin-top: 140px;
-  margin-bottom: 80px;
+  margin-top: 50px;
+  margin-bottom: 100px;
 }
 
 .section-heading h2 {
@@ -202,7 +203,7 @@ header
 */
 
 .background-header {
-  background: rgba(250,250,250,0.99) !important;
+  background: rgba(31, 38, 63, 255) !important;
   height: 80px!important;
   position: fixed!important;
   top: 0px;
@@ -213,7 +214,7 @@ header
 
 .background-header .logo,
 .background-header .main-nav .nav li a {
-  color: #232d39!important;
+  color: #efe9ff!important;
 }
 
 .background-header .main-nav .nav li:last-child a {
@@ -669,9 +670,16 @@ features
   margin-bottom: 80px;
 }
 
+.feature-list {
+    text-align: center;
+}
+
 .feature-item {
-  display: inline-block;
-  margin-bottom: 60px;
+    display: inline-block;
+    margin-bottom: 60px;
+    position: relative;
+    width: 100%;
+    text-align: left;
 }
 
 .feature-item .left-icon img {
@@ -710,7 +718,7 @@ subscribe
 
 #call-to-action {
   padding: 120px 0px;
-  background-image: url(../images/cta-bg.jpg);
+  background-image: url(../img/cta-bg.jpg);
   background-position: center center;
   background-repeat: no-repeat;
   background-size: cover;
@@ -840,7 +848,7 @@ schedule
 
 #schedule {
   padding: 0px 0px 140px 0px;
-  background-image: url(../images/schedule-bg.jpg);
+  background-image: url(../img/schedule-bg.jpg);
   background-position: center center;
   background-repeat: no-repeat;
   background-size: cover;
@@ -1010,7 +1018,7 @@ contact
 
 #contact-us .contact-form {
   padding: 80px;
-  background-image: url(../images/contact-bg.jpg);
+  background-image: url(../img/contact-bg.jpg);
   background-position: center center;
   background-repeat: no-repeat;
   background-size: cover;
@@ -1305,3 +1313,10 @@ responsive
 .cyberpunk-btn:focus {
     outline: none;
 }
+
+/* 前台index產品迭代css */
+.row { display: flex; flex-wrap: wrap; }
+.col-lg-4 { width: 33.33%; padding: 10px; box-sizing: border-box; }
+.card { border: 1px solid #ddd;}
+.imgBox img { width: 100%; }
+.price { color: #333; }

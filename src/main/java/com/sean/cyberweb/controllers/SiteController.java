@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
 @RequestMapping("/site")
-public class IndexController {
+public class SiteController {
 
     // 首頁
     @GetMapping("/index")

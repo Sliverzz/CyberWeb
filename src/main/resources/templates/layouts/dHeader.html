@@ -14,6 +14,8 @@
     <!-- Nucleo Icons -->
     <link href="/assets/css/nucleo-icons.css" rel="stylesheet" />
     <link href="/assets/css/nucleo-svg.css" rel="stylesheet" />
+    <!-- Custom Datatable -->
+    <link href="/assets/css/custom-datatable.css" rel="stylesheet" />
     <!-- Font Awesome Icons -->
     <script src="https://kit.fontawesome.com/0a9f356c66.js" crossorigin="anonymous"></script>
     <!-- Material Icons -->
@@ -77,6 +79,7 @@
             color: #ffd1ff; /* 滑上連接時的顏色 */
             text-decoration: underline; /* 下底線 */
         }
+
     </style>
     <!-- Nepcha Analytics (nepcha.com) -->
     <!-- Nepcha is a easy-to-use web analytics. No cookies and fully compliant with GDPR, CCPA and PECR. -->
@@ -89,7 +92,7 @@
 <aside class="sidenav navbar navbar-vertical navbar-expand-xs border-0 border-radius-xl my-3 fixed-start ms-3   bg-gradient-dark" id="sidenav-main">
     <div class="sidenav-header">
         <i class="fas fa-times p-3 cursor-pointer text-white opacity-5 position-absolute end-0 top-0 d-none d-xl-none" aria-hidden="true" id="iconSidenav"></i>
-        <a class="navbar-brand m-0" href="" target="_blank">
+        <a class="navbar-brand m-0" href="/site/index" target="_blank">
             <img src="/assets/img/logos/cyber-web-logo.png" class="navbar-brand-img h-100" alt="main_logo">
             <span class="ms-1 font-weight-bold text-white">CYBER WEB</span>
         </a>
@@ -102,7 +105,7 @@
                     <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
                         <i class="fa-solid fa-chalkboard"></i>
                     </div>
-                    <span class="nav-link-text ms-1">主控台</span>
+                    <span class="nav-link-text ms-1">Dashboard</span>
                 </a>
             </li>
             <li class="nav-item">
@@ -110,7 +113,7 @@
                     <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
                         <i class="fa-solid fa-user"></i>
                     </div>
-                    <span class="nav-link-text ms-1">會員</span>
+                    <span class="nav-link-text ms-1">Member</span>
                 </a>
             </li>
             <li class="nav-item">
@@ -118,7 +121,7 @@
                     <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
                         <i class="fa-solid fa-bag-shopping"></i>
                     </div>
-                    <span class="nav-link-text ms-1">商品</span>
+                    <span class="nav-link-text ms-1">Product</span>
                 </a>
             </li>
             <li class="nav-item">
@@ -126,7 +129,7 @@
                     <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
                         <i class="fa-solid fa-cash-register"></i>
                     </div>
-                    <span class="nav-link-text ms-1">訂單</span>
+                    <span class="nav-link-text ms-1">Order</span>
                 </a>
             </li>
         </ul>
@@ -137,7 +140,7 @@
     <nav class="navbar navbar-main navbar-expand-lg px-0 mx-4 shadow-none border-radius-xl" id="navbarBlur">
         <div class="container-fluid py-1 px-3">
             <nav aria-label="breadcrumb">
-                <h6 class="font-weight-bolder mb-0" style="color: #faecff; font-size: 20px;">主控台</h6>
+                <h6 class="font-weight-bolder mb-0" style="color: #faecff; font-size: 20px;">Dashboard</h6>
             </nav>
             <div class="collapse navbar-collapse mt-sm-0 mt-2 me-md-0 me-sm-4" id="navbar">
                 <div class="ms-md-auto pe-md-3 d-flex align-items-center">
@@ -155,7 +158,7 @@
                     <li class="nav-item d-flex align-items-center">
                         <div>
                             <div class="auth-info" sec:authorize="isAuthenticated()">
-                                <span class="font-weight-bold" th:text="'歡迎' + ${user.username} + ', '"></span><a href="/logout">登出</a>
+                                <span class="font-weight-bold" th:text="'Welcome ' + ${user.username} + ', '"></span><a href="/logout">Logout</a>
                             </div>
                         </div>
                     </li>
