@@ -1315,8 +1315,39 @@ responsive
 }
 
 /* 前台index產品迭代css */
-.row { display: flex; flex-wrap: wrap; }
-.col-lg-4 { width: 33.33%; padding: 10px; box-sizing: border-box; }
-.card { border: 1px solid #ddd;}
-.imgBox img { width: 100%; }
-.price { color: #333; }
+.row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-right: -300px;
+    margin-left: -300px;
+}
+
+.col-lg-4 {
+    width: 33.33%;
+    padding: 10px;
+    box-sizing: border-box;
+    margin: 0;
+}
+
+.card {
+    border: 1px solid #ddd;
+    box-sizing: border-box;
+}
+
+.imgBox img {
+    width: 100%;
+    height: auto;
+}
+
+.price {
+    color: #333;
+}
+
+/* Cyberpunk圖片位置 */
+.image-container {
+    display: flex;
+    justify-content: center;
+}
+
+
