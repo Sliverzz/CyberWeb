@@ -23,6 +23,7 @@
             <th>Description</th>
             <th>Price</th>
             <th>Stock</th>
+            <th>Status</th>
             <th>Option</th>
         </tr>
         </thead>
@@ -57,6 +58,10 @@
                     <div class="mb-3">
                         <label for="productStock" class="form-label">Stock</label>
                         <input type="number" class="form-control" id="productStock" name="stock" min="0" max="500" style="border: 1px solid #ced4da !important; border-radius: 0.25rem !important; padding: 10px;" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="productStatus" class="form-label">Status</label>
+                        <input type="checkbox" class="form-check-input form-control" id="productStatus" name="Status" style="border: 1px solid #ced4da; border-radius: 0.25rem; padding: 10px;">
                     </div>
                     <div class="mb-3">
                         <label for="productImage" class="form-label">Image</label>
@@ -104,6 +109,10 @@
                         <input type="number" class="form-control" id="editProductStock" name="stock" min="0" max="500" style="border: 1px solid #ced4da; border-radius: 0.25rem; padding: 10px;" required>
                     </div>
                     <div class="mb-3">
+                        <label for="editProductStatus" class="form-label">Status</label>
+                        <input type="checkbox" class="form-check-input form-control" id="editProductStatus" name="Status" style="border: 1px solid #ced4da; border-radius: 0.25rem; padding: 10px;">
+                    </div>
+                    <div class="mb-3">
                         <label for="editProductImage" class="form-label">Image</label>
                         <input type="file" class="form-control" id="editProductImage" name="productImage" style="border: 1px solid #ced4da !important; border-radius: 0.25rem !important; padding: 10px;">
                         <!-- 圖片預覽區域 -->
@@ -145,6 +154,16 @@
                 {"data": "price"},
                 {"data": "stock"},
                 {
+                    "data": "status",
+                    "render": function (data, type, row, meta) {
+                        if (data) {
+                            return '<span class="text-success"><i class="fa fa-circle"></i> On</span>'; // 使用 Font Awesome 或其他圖標
+                        } else {
+                            return '<span class="text-danger"><i class="fa fa-circle"></i> Off</span>';
+                        }
+                    }
+                },
+                {
                     "data": "id",
                     "render": function (data, type, row, meta) {
                         return '<button class="btn btn-primary profile-button" style="margin-top: 15px" onclick="getProductInfo(' + data + ')">Edit</button>' + " " +
@@ -171,6 +190,13 @@
                 $('#editProductDescription').val(data.description);
                 $('#editProductPrice').val(data.price);
                 $('#editProductStock').val(data.stock);
+
+                // 根據產品狀態動態修改checkbox狀態
+                if (data.status) {
+                    $('#editProductStatus').prop('checked', true);
+                } else {
+                    $('#editProductStatus').prop('checked', false);
+                }
 
                 // 更新圖片顯示
                 if (data.productImagePath) {

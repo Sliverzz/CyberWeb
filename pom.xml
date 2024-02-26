@@ -65,8 +65,7 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-devtools</artifactId>
             <scope>runtime</scope>
-            <optional>true</optional>
-            <!-- 必須修改為true，預設是false -->
+            <optional>true</optional><!-- 必須修改為true，預設是false -->
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>

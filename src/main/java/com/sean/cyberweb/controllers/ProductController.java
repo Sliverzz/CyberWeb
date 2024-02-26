@@ -82,7 +82,7 @@ public class ProductController {
     @GetMapping("/fetchProducts")
     public ResponseEntity<Page<Product>> listProducts(@RequestParam(value = "page", defaultValue = "0") int page,
                                                       @RequestParam(value = "size", defaultValue = "10") int size) {
-        Page<Product> products = productService.findAll(PageRequest.of(page, size));
+        Page<Product> products = productService.findAllActiveProducts(PageRequest.of(page, size));
         return ResponseEntity.ok(products);
     }
 

@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.data.domain.Pageable;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -27,6 +28,10 @@ public class ProductService {
 
     public Page<Product> findAll(PageRequest pageRequest) {
         return productRepository.findAll(pageRequest);
+    }
+
+    public Page<Product> findAllActiveProducts(Pageable pageable) {
+        return productRepository.findByStatusTrue(pageable);
     }
 
     public Page<Product> findByNameContainingIgnoreCase(String name, PageRequest pageRequest) {
@@ -54,6 +59,7 @@ public class ProductService {
             existingProduct.setDescription(product.getDescription());
             existingProduct.setPrice(product.getPrice());
             existingProduct.setStock(product.getStock());
+            existingProduct.setStatus(product.isStatus());
 
             targetProduct = existingProduct;
         }

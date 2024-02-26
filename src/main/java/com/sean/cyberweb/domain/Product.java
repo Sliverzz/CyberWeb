@@ -36,6 +36,9 @@ public class Product {
     @Column(name = "product_image_path")
     private String productImagePath; // 產品圖片位址
 
+    @Column(nullable = false)
+    private boolean status; // 上下架狀態
+
     public boolean hasProductImgUrl() {
         return productImagePath != null && !productImagePath.isEmpty();
     }

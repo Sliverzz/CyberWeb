@@ -1,10 +1,98 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+<body class="g-sidenav-show  bg-gray-200">
 
+<!-- (*各頁面自訂內容) -->
+
+</div>
+<main class="main-content position-relative max-height-vh-100 h-100 border-radius-lg ">
+    <div class="container-fluid py-4">
+        <footer class="footer py-4">
+            <div class="container-fluid">
+                <div class="row align-items-center justify-content-lg-between">
+                    <div class="col-lg-6 mb-lg-0 mb-4">
+                        <div class="copyright text-center text-sm text-muted text-lg-start">
+                            © <script>document.write(new Date().getFullYear())</script>, Customizing by sean.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+</main>
+
+<!--   Core JS Files   -->
+<script src="/assets/js/core/popper.min.js"></script>
+<script src="/assets/js/core/bootstrap.min.js"></script>
+<script src="/assets/js/plugins/chartjs.min.js"></script>
+<!-- AJAX -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<!-- Validate -->
+<script src="https://ajax.aspnetcdn.com/ajax/jquery.validate/1.19.3/jquery.validate.js"></script>
+
+<!-- 暫時用不到scroll、material -->
+<!--<script src="/assets/js/plugins/perfect-scrollbar.min.js"></script>-->
+<!--<script src="/assets/js/plugins/smooth-scrollbar.min.js"></script>-->
+<!--<script src="/assets/js/material-dashboard.min.js?v=3.1.0"></script>-->
+
+<script th:inline="javascript">
+
+    // 暫時用不到scroll
+    // var win = navigator.platform.indexOf('Win') > -1;
+    // if (win && document.querySelector('#sidenav-scrollbar')) {
+    //     var options = {
+    //         damping: '0.5'
+    //     }
+    //     Scrollbar.init(document.querySelector('#sidenav-scrollbar'), options);
+    // }
+
+    // Sidebar 導航 active
+    document.addEventListener("DOMContentLoaded", function() {
+        // 獲取當前頁面路徑名稱
+        var path = window.location.pathname;
+
+        // 查詢所有導航連結
+        var navLinks = document.querySelectorAll('.navbar-nav .nav-link');
+
+        // 找到 href 與當前 路徑匹配的連結
+        navLinks.forEach(function(link) {
+            if (link.getAttribute('href') === path) {
+                // 給找到的連結新增 active
+                link.classList.add('active', 'bg-gradient-primary');
+            } else {
+                // 確保其他連結沒有 active
+                link.classList.remove('active', 'bg-gradient-primary');
+            }
+        });
+    });
+
+    // swl2
+    var flashMessage = /*[[${flashMessage}]]*/ null;
+    var flashMessageType = /*[[${flashMessageType}]]*/ null;
+
+    if (flashMessage && flashMessageType) {
+        var icon = 'info'; // 默認圖標
+
+        switch(flashMessageType) {
+            case 'success':
+                icon = 'success';
+                break;
+            case 'error':
+                icon = 'error';
+                break;
+            case 'warning':
+                icon = 'warning';
+                break;
+            // 更多的情況可以繼續添加
+        }
+
+        Swal.fire({
+            title: 'Notification',
+            text: flashMessage,
+            icon: icon,
+            confirmButtonText: 'OK'
+        });
+    }
+</script>
 </body>
 </html>
