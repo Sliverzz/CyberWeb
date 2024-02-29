@@ -2,6 +2,8 @@ package com.sean.cyberweb.controllers;
 
 import com.sean.cyberweb.domain.Product;
 import com.sean.cyberweb.services.ProductService;
+import com.sean.cyberweb.utils.WebUtils;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -52,25 +54,24 @@ public class ProductController {
         return ResponseEntity.ok(data);
     }
 
-
     @PostMapping("/create")
-    public String createProduct(@ModelAttribute Product product, @RequestParam(value = "productImage") MultipartFile file, RedirectAttributes redirectAttributes) {
+    public String createProduct(@ModelAttribute Product product, @RequestParam(value = "productImage") MultipartFile file,
+                                HttpServletRequest request, RedirectAttributes redirectAttributes) {
         if (file.isEmpty()) {
-            redirectAttributes.addFlashAttribute("flashMessage", "Please select a file to upload.");
-            return "redirect:/dashboard/product";
+            // flashMessage與重導
+            WebUtils.addFlashMessage(redirectAttributes, "warning", "Please select a file to upload.");
+            return WebUtils.redirectBack(request, WebUtils.DEFAULT_REDIRECT);
         }
         try {
             productService.saveOrUpdateProduct(product, file);
-            redirectAttributes.addFlashAttribute("flashMessageType", "success");
-            redirectAttributes.addFlashAttribute("flashMessage", "You successfully uploaded !");
+            WebUtils.addFlashMessage(redirectAttributes, "success", "You successfully uploaded !");
 
         } catch (IOException e) {
             e.printStackTrace();
-            redirectAttributes.addFlashAttribute("flashMessageType", "error");
-            redirectAttributes.addFlashAttribute("flashMessage", "Could not upload the file: " + file.getOriginalFilename() + "!");
+            WebUtils.addFlashMessage(redirectAttributes, "error", "Could not upload the file: " + file.getOriginalFilename() + "!");
         }
 
-        return "redirect:/dashboard/product";
+        return WebUtils.redirectBack(request, WebUtils.DEFAULT_REDIRECT);
     }
 
     @GetMapping("/productInfo")
@@ -87,30 +88,27 @@ public class ProductController {
     }
 
     @PostMapping("/update")
-    public String updateProduct(@ModelAttribute Product product , @RequestParam(value = "productImage") MultipartFile file, RedirectAttributes redirectAttributes) {
+    public String updateProduct(@ModelAttribute Product product , @RequestParam(value = "productImage") MultipartFile file,
+                                HttpServletRequest request, RedirectAttributes redirectAttributes) {
         try {
             productService.saveOrUpdateProduct(product, file);
-            redirectAttributes.addFlashAttribute("flashMessageType", "success");
-            redirectAttributes.addFlashAttribute("flashMessage", "Product updated successfully!");
+            WebUtils.addFlashMessage(redirectAttributes, "success", "Product updated successfully!");
         } catch (Exception e) {
             e.printStackTrace();
-            redirectAttributes.addFlashAttribute("flashMessageType", "error");
-            redirectAttributes.addFlashAttribute("flashMessage", "Error updating product: " + e.getMessage());
+            WebUtils.addFlashMessage(redirectAttributes, "error", "Error updating product: " + e.getMessage());
         }
-        return "redirect:/dashboard/product";
+        return WebUtils.redirectBack(request, WebUtils.DEFAULT_REDIRECT);
     }
 
     @PostMapping("/delete")
-    public String deleteProduct(@RequestParam("id") Long id, RedirectAttributes redirectAttributes) {
+    public String deleteProduct(@RequestParam("id") Long id,HttpServletRequest request,RedirectAttributes redirectAttributes) {
         try {
             productService.deleteProductById(id);
-            redirectAttributes.addFlashAttribute("flashMessageType", "success");
-            redirectAttributes.addFlashAttribute("flashMessage", "商品已被刪除。");
+            WebUtils.addFlashMessage(redirectAttributes, "success", "The product has been deleted.");
         } catch (Exception e) {
             e.printStackTrace();
-            redirectAttributes.addFlashAttribute("flashMessageType", "error");
-            redirectAttributes.addFlashAttribute("flashMessage", "刪除商品時發生錯誤：" + e.getMessage());
+            WebUtils.addFlashMessage(redirectAttributes, "error", "An error occurred while deleting the product：" + e.getMessage());
         }
-        return "redirect:/dashboard/product";
+        return WebUtils.redirectBack(request, WebUtils.DEFAULT_REDIRECT);
     }
 }

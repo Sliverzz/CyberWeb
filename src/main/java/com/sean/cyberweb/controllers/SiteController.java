@@ -14,12 +14,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class SiteController {
 
     private final UserService userService;
-    private final ProductService productService;
 
     @Autowired
-    public SiteController(UserService userService, ProductService productService) {
+    public SiteController(UserService userService) {
         this.userService = userService;
-        this.productService = productService;
     }
 
     // 首頁

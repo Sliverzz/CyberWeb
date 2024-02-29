@@ -14,12 +14,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class DashboardController {
 
     private final UserService userService;
-    private final ProductService productService;
 
     @Autowired
-    public DashboardController(UserService userService, ProductService productService) {
+    public DashboardController(UserService userService) {
         this.userService = userService;
-        this.productService = productService;
     }
 
     // 首頁
