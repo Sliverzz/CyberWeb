@@ -4,7 +4,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.annotation.authentication.configuration.EnableGlobalAuthentication;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -14,8 +13,11 @@ import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
+
+import java.util.Objects;
 
 @Configuration
 @EnableWebSecurity
@@ -41,23 +43,33 @@ public class SecurityConfig {
                         .sessionRegistry(sessionRegistry()) // 使用自定義的sessionRegistry
                 )
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/dashboard/login", "/dashboard/signUp").permitAll() // 允許訪問登入和註冊頁面
-                        .requestMatchers("/dashboard/**").authenticated() // "/dashboard/**"下的所有請求都需要驗證
+                        .requestMatchers("/user/login", "/user/signUp", "/site/index").permitAll() // 允許所有訪問登入、註冊、前台首頁
+                        .requestMatchers("/dashboard/**").hasRole("ADMIN") // "/dashboard/**"限制只有ADMIN
+                        .requestMatchers("/site/**").hasAnyRole("ADMIN", "USER") // "/site/**"對ADMIN和USER開放
                         .anyRequest().permitAll() // 其他所有請求允許訪問
                 )
+                .exceptionHandling(exception -> exception
+                        .accessDeniedHandler(customAccessDeniedHandler())
+                )
                 .formLogin(form -> form
-                        .loginPage("/dashboard/login") // 自定義登入頁面
-                        .loginProcessingUrl("/login") //登入url
+                        .loginPage("/user/login") // 自定義登入頁面
+                        .loginProcessingUrl("/login") // 登入url
                         .defaultSuccessUrl("/site/index", true) // 登入成功後的導向
                         .permitAll() // 允許所有用戶訪問登入頁面
                 )
                 .logout(logout -> logout
                         .invalidateHttpSession(true)
                         .clearAuthentication(true) // 確保清除認證
-                        .logoutSuccessUrl("/dashboard/login")
+                        .logoutSuccessUrl("/user/login") // 登出成功後的導向頁面
                         .addLogoutHandler(customLogoutHandler(sessionRegistry())) // 確保SecurityContext被清除
                 );
         return http.build();
+    }
+
+    // session管理器
+    @Bean
+    public SessionRegistry sessionRegistry() {
+        return new SessionRegistryImpl();
     }
 
     // 自定義登出處理器
@@ -71,9 +83,14 @@ public class SecurityConfig {
         };
     }
 
-    // session管理器
+    // 自定義403錯誤處理器
     @Bean
-    public SessionRegistry sessionRegistry() {
-        return new SessionRegistryImpl();
+    public AccessDeniedHandler customAccessDeniedHandler() {
+        return (HttpServletRequest request, HttpServletResponse response, org.springframework.security.access.AccessDeniedException e) -> {
+            // 使用HTTP頭部的Referer值來重定向回上一頁
+            String refererUrl = request.getHeader("Referer");
+            // 如果Referer頭部不存在，重定向到默認頁面或首頁
+            response.sendRedirect(Objects.requireNonNullElse(refererUrl, "/site/index"));
+        };
     }
 }

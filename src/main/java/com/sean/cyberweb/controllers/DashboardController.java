@@ -1,20 +1,13 @@
 package com.sean.cyberweb.controllers;
 
 import com.sean.cyberweb.domain.User;
-import com.sean.cyberweb.domain.Product;
 import com.sean.cyberweb.services.ProductService;
 import com.sean.cyberweb.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.annotation.Secured;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-
-import java.nio.file.Files;
-import java.nio.file.Paths;
 
 @Controller
 @RequestMapping("/dashboard")
@@ -29,21 +22,8 @@ public class DashboardController {
         this.productService = productService;
     }
 
-    // 後台登入
-    @GetMapping("/login")
-    public String login(){
-        return "/pages/dashboard/login";
-    }
-
-    // 後台註冊
-    @GetMapping("/signUp")
-    public String signUp(){
-        return "/pages/dashboard/signUp";
-    }
-
-    // 後台首頁
+    // 首頁
     @GetMapping("/index")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public String dashboard(Model model) {
         User currentUser = userService.getCurrentUser();
 
@@ -78,6 +58,7 @@ public class DashboardController {
         return "/pages/dashboard/profile";
     }
 
+    // 產品
     @GetMapping("/product")
     public String product(Model model) {
         User currentUser = userService.getCurrentUser();

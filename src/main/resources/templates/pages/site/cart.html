@@ -182,12 +182,12 @@
                     <!-- ***** Logo End ***** -->
                     <!-- ***** Menu Start ***** -->
                     <ul class="nav">
-                        <li class="scroll-to-section"><a href="#top" style=""><i class="fa-solid fa-house"></i> Home</a></li>
-                        <li class="scroll-to-section"><a href="#features"><i class="fa-solid fa-gun"></i> Gun</a></li>
+                        <li class="scroll-to-section"><a href="/site/index"><i class="fa-solid fa-house"></i> Home</a></li>
+                        <li class="scroll-to-section"><a href="/site/index#features"><i class="fa-solid fa-gun"></i> Gun</a></li>
                         <li class="scroll-to-section"><a href=""><i class="fa-solid fa-cart-shopping"></i> Cart</a></li>
                         <!-- 如果用戶未登入，顯示登入按鈕 -->
                         <li class="main-button" sec:authorize="!isAuthenticated()">
-                            <form action="/dashboard/login" method="get">
+                            <form action="/user/login" method="get">
                                 <button type="submit" class="cyberpunk-btn">Login</button>
                             </form>
                         </li>
@@ -195,7 +195,7 @@
                         <li class="main-button dropdown" sec:authorize="isAuthenticated()">
                             <button class="cyberpunk-btn dropBtn">Welcome, <span sec:authentication="name">User</span></button>
                             <div class="dropdown-content">
-                                <form action="" method="get">
+                                <form action="/site/profile" method="get">
                                     <button type="submit" class="cyberpunk-btn">Member</button>
                                 </form>
                                 <form action="/dashboard/index" method="get" sec:authorize="hasAuthority('ROLE_ADMIN')">

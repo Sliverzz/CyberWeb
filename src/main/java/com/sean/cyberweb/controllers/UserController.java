@@ -23,6 +23,18 @@ public class UserController {
         this.userService = userService;
     }
 
+    // 登入頁
+    @GetMapping("/login")
+    public String login(){
+        return "/pages/user/login";
+    }
+
+    // 註冊頁
+    @GetMapping("/signUp")
+    public String signUp(){
+        return "/pages/user/signUp";
+    }
+
     // 註冊
     @PostMapping("/signUp")
     public String signUp(@ModelAttribute User user, RedirectAttributes redirectAttributes) {
@@ -33,12 +45,12 @@ public class UserController {
             // 註冊成功，傳遞成功消息
             redirectAttributes.addFlashAttribute("flashMessageType", "success");
             redirectAttributes.addFlashAttribute("flashMessage", "Registration successful!");
-            return "redirect:/dashboard/login"; // 重定向到登入頁面
+            return "redirect:/user/login"; // 重定向到登入頁面
         } else {
             // 註冊失敗，傳遞失敗消息
             redirectAttributes.addFlashAttribute("flashMessageType", "error");
             redirectAttributes.addFlashAttribute("flashMessage", "Registration failed. Please try again.");
-            return "redirect:/dashboard/signUp"; // 重定向回註冊頁面
+            return "redirect:/user/signUp"; // 重定向回註冊頁面
         }
     }
 

@@ -106,12 +106,12 @@
                     <!-- ***** Logo End ***** -->
                     <!-- ***** Menu Start ***** -->
                     <ul class="nav">
-                        <li class="scroll-to-section"><a href="#top" style=""><i class="fa-solid fa-house"></i> Home</a></li>
+                        <li class="scroll-to-section"><a href="#top"><i class="fa-solid fa-house"></i> Home</a></li>
                         <li class="scroll-to-section"><a href="#features"><i class="fa-solid fa-gun"></i> Gun</a></li>
                         <li class="scroll-to-section"><a href="/site/cart"><i class="fa-solid fa-cart-shopping"></i> Cart</a></li>
                         <!-- 如果用戶未登入，顯示登入按鈕 -->
                         <li class="main-button" sec:authorize="!isAuthenticated()">
-                            <form action="/dashboard/login" method="get">
+                            <form action="/user/login" method="get">
                                 <button type="submit" class="cyberpunk-btn">Login</button>
                             </form>
                         </li>
@@ -258,6 +258,19 @@
             })
             .catch(error => console.error('Error fetching products:', error));
     }
+
+    $(document).ready(function() {
+        // 檢測 URL 中是否有hash
+        var hash = window.location.hash;
+
+        // 如果 hash 存在，就滾動到指定位置
+        if(hash === '#features') {
+            $('html, body').animate({
+                scrollTop: $(hash).offset().top
+            }, 500); // 滾動持續時間（毫秒）
+        }
+    });
+
 </script>
 
 </body>
