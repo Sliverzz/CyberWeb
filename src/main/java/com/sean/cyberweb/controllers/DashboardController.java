@@ -5,6 +5,8 @@ import com.sean.cyberweb.domain.Product;
 import com.sean.cyberweb.services.ProductService;
 import com.sean.cyberweb.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -41,6 +43,7 @@ public class DashboardController {
 
     // 後台首頁
     @GetMapping("/index")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public String dashboard(Model model) {
         User currentUser = userService.getCurrentUser();
 
