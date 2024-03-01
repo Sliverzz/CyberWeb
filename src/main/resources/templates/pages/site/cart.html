@@ -152,11 +152,9 @@
         }
 
     </style>
-
 </head>
 
 <body>
-
 <!-- ***** Preloader Start ***** -->
 <div id="js-preloader" class="js-preloader">
     <div class="preloader-inner">
@@ -229,32 +227,14 @@
         <div class="caption">
             <div class="cyberpunk-cart">
                 <h4 class="cart-title">Cart</h4>
+                <!-- Cart items container will be dynamically filled based on localStorage data -->
                 <div class="cart-items">
-                    <div class="cart-item">
-                        <div class="item-info">
-                            <div class="item-image">
-                                <img src="/assets/img/product-1.png" alt="item1">
-                            </div>
-                            <div class="item-details">
-                                <span class="item-name">Cyber Goggles</span>
-                                <span class="item-price">$199.99</span>
-                            </div>
-                        </div>
-                        <div class="item-quantity">
-                            <button class="quantity-decrease">-</button>
-                            <input type="text" value="1">
-                            <button class="quantity-increase">+</button>
-                        </div>
-                        <div class="item-total">
-                            <span>$199.99</span>
-                        </div>
-                        <button class="item-remove">Remove</button>
-                    </div>
-                    <!-- Repeat for other items -->
+                    <!-- Dynamic cart items will be appended here by JavaScript -->
                 </div>
                 <div class="cart-summary">
                     <span class="summary-title">Total:</span>
-                    <span class="summary-price">$199.99</span>
+                    <!-- The total price will be dynamically updated by JavaScript -->
+                    <span class="summary-price">$0.00</span>
                 </div>
                 <button class="checkout-btn">Checkout</button>
             </div>
@@ -283,6 +263,77 @@
 <script src="/assets/js/custom.js"></script>
 
 <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        updateCartUI(); // 頁面加載就更新購物車資訊
+    });
+
+    function updateCartUI() {
+        const cartItems = JSON.parse(localStorage.getItem('cart')) || [];
+        const cartItemsContainer = document.querySelector('.cart-items');
+        cartItemsContainer.innerHTML = ''; // 清空现有的购物车项目
+
+        let total = 0;
+        cartItems.forEach((item, index) => {
+            const cartItemElement = document.createElement('div');
+            cartItemElement.className = 'cart-item';
+            cartItemElement.innerHTML = `
+        <div class="item-info">
+            <div class="item-image">
+                <img src="${item.productImagePath}" alt="${item.name}">
+            </div>
+            <div class="item-details">
+                <span class="item-name">${item.name}</span>
+                <span class="item-price">$${item.price}</span>
+            </div>
+        </div>
+        <div class="item-quantity">
+            <button class="quantity-decrease" data-index="${index}">-</button>
+            <input type="text" value="${item.quantity}">
+            <button class="quantity-increase" data-index="${index}">+</button>
+        </div>
+        <div class="item-total">
+            <span>$${(item.price * item.quantity).toFixed(2)}</span>
+        </div>
+        <button class="item-remove" data-index="${index}">Remove</button>
+    `;
+            cartItemsContainer.appendChild(cartItemElement);
+            total += item.price * item.quantity;
+        });
+
+        // 更新總計
+        const summaryPrice = document.querySelector('.summary-price');
+        summaryPrice.textContent = `$${total.toFixed(2)}`;
+
+        // 為增減和移除按鈕添加事件監聽
+        document.querySelectorAll('.quantity-increase').forEach(button => {
+            button.addEventListener('click', () => {
+                const index = button.getAttribute('data-index');
+                cartItems[index].quantity += 1;
+                localStorage.setItem('cart', JSON.stringify(cartItems));
+                updateCartUI();
+            });
+        });
+
+        document.querySelectorAll('.quantity-decrease').forEach(button => {
+            button.addEventListener('click', () => {
+                const index = button.getAttribute('data-index');
+                if (cartItems[index].quantity > 1) {
+                    cartItems[index].quantity -= 1;
+                    localStorage.setItem('cart', JSON.stringify(cartItems));
+                    updateCartUI();
+                }
+            });
+        });
+
+        document.querySelectorAll('.item-remove').forEach(button => {
+            button.addEventListener('click', () => {
+                const index = button.getAttribute('data-index');
+                cartItems.splice(index, 1); // 從數組中移除項目
+                localStorage.setItem('cart', JSON.stringify(cartItems));
+                updateCartUI(); // 更新UI
+            });
+        });
+    }
 
 </script>
 

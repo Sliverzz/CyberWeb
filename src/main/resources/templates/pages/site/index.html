@@ -74,6 +74,86 @@
             cursor: pointer;
         }
 
+        .cyberpunk-alert {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            animation: fadeIn 0.5s;
+            align-items: center;
+            justify-content: center;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 10000;
+        }
+
+        .cyberpunk-alert-content {
+            display: flex; /* 使用 Flexbox 布局 */
+            flex-direction: column; /* 子元素垂直排列 */
+            justify-content: center; /* 垂直居中 */
+            align-items: center; /* 水平居中 */
+            padding: 20px;
+            border-radius: 5px;
+            min-width: 500px;
+            min-height: 500px;
+            text-align: center; /* 确保文本居中，对于部分元素可能需要 */
+            background: #111;
+            color: #0f0;
+            text-shadow: 0 0 5px #0f0, 0 0 10px #0f0, 0 0 20px #0f0, 0 0 40px #0f0;
+            box-shadow: 0 0 5px #0f0, 0 0 10px #0f0, 0 0 20px #0f0, 0 0 40px #0f0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cyberpunk-alert-content h2 {
+            font-size: 5em;
+            margin: 0.5em 0;
+        }
+
+        .cyberpunk-alert-content p {
+            font-size: 1.5em;
+            margin: 0.5em 0;
+        }
+
+        .cyberpunk-alert-content button {
+            cursor: pointer;
+            border: none;
+            padding: 10px 20px;
+            margin-top: 20px;
+            display: inline-block;
+            background: #222;
+            color: #0f0;
+            text-shadow: none;
+            border-radius: 5px;
+            transition: background 0.3s ease;
+        }
+
+        .cyberpunk-alert-content button:hover {
+            background: #333;
+        }
+
+        @keyframes flicker {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .cyberpunk-alert-content h2 {
+            animation: flicker 1s infinite;
+        }
+
+        /* 淡出動畫 */
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+
+        /* 淡入動畫 */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
 
     </style>
 
@@ -182,6 +262,15 @@
 </section>
 <!-- ***** Features Item End ***** -->
 
+<!-- Cyberpunk 弹窗容器 -->
+<div id="cyberpunkAlert" class="cyberpunk-alert" style="display: none;">
+    <div class="cyberpunk-alert-content">
+        <h2 id="alertTitle">Success!</h2>
+        <p id="alertMessage">Product added to cart!</p>
+        <button onclick="closeCyberpunkAlert()">OK</button>
+    </div>
+</div>
+
 <!-- ***** Footer Start ***** -->
 <footer>
     <div class="container" style="margin-left: -400px">
@@ -214,62 +303,132 @@
 <!-- Global Init -->
 <script src="/assets/js/custom.js"></script>
 
+<!-- swl2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        fetchProducts();
+    document.addEventListener('DOMContentLoaded', async () => {
+        initializeCart();
+        await fetchProducts();
+        setupPageScroll();
     });
 
-    function fetchProducts() {
-        fetch('/product/fetchProducts')
-            .then(response => response.json())
-            .then(data => {
-                const products = data.content;
-                const productRow = document.getElementById('productRow');
-                let newRow = productRow; // 初始化為現有的行
-
-                products.forEach((product, index) => {
-                    // 每三個產品換行的邏輯
-                    if (index % 3 === 0) {
-                        newRow = document.createElement('div');
-                        newRow.className = 'row';
-                        productRow.parentNode.appendChild(newRow);
-                    }
-
-                    const colDiv = document.createElement('div');
-                    colDiv.className = 'col-lg-4';
-                    colDiv.innerHTML = `
-                <ul class="features-items">
-                    <li class="feature-item">
-                        <div class="card">
-                            <div class="imgBox">
-                                <img src="${product.productImagePath}" alt="${product.name}" class="mouse">
-                            </div>
-                            <div class="contentBox">
-                                <h3>${product.name}</h3>
-                                <h2 class="price">$${product.price}</h2>
-                                <a href="#" class="buy">Buy Now</a>
-                            </div>
-                        </div>
-                    </li>
-                </ul>
-            `;
-                    newRow.appendChild(colDiv); // 將新的產品列添加到當前行
-                });
-            })
-            .catch(error => console.error('Error fetching products:', error));
+    async function fetchProducts() {
+        try {
+            const response = await fetch('/product/fetchProducts');
+            const data = await response.json();
+            displayProducts(data.content);
+        } catch (error) {
+            console.error('Error fetching products:', error);
+        }
     }
 
-    $(document).ready(function() {
-        // 檢測 URL 中是否有hash
-        var hash = window.location.hash;
+    function displayProducts(products) {
+        const productRow = document.getElementById('productRow');
+        let newRow = productRow;
 
-        // 如果 hash 存在，就滾動到指定位置
-        if(hash === '#features') {
-            $('html, body').animate({
-                scrollTop: $(hash).offset().top
-            }, 500); // 滾動持續時間（毫秒）
+        products.forEach((product, index) => {
+            if (index % 3 === 0) {
+                newRow = document.createElement('div');
+                newRow.className = 'row';
+                productRow.parentNode.appendChild(newRow);
+            }
+            const colDiv = createProductColDiv(product);
+            newRow.appendChild(colDiv);
+        });
+    }
+
+    function createProductColDiv(product) {
+        const colDiv = document.createElement('div');
+        colDiv.className = 'col-lg-4';
+        colDiv.innerHTML = `
+    <ul class="features-items">
+        <li class="feature-item" data-product-id="${product.id}">  <!-- 添加data-product-id作為唯一值 -->
+            <div class="card">
+                <div class="imgBox">
+                    <img src="${product.productImagePath}" alt="${product.name}" class="mouse">
+                </div>
+                <div class="contentBox">
+                    <h3>${product.name}</h3>
+                    <h2 class="price">$${product.price}</h2>
+                    <a href="#" class="buy">Buy Now</a>
+                </div>
+            </div>
+        </li>
+    </ul>`;
+        return colDiv;
+    }
+
+    function initializeCart() {
+        if (!localStorage.getItem('cart')) {
+            localStorage.setItem('cart', JSON.stringify([]));
+        }
+    }
+
+    document.addEventListener('click', (event) => {
+        if (event.target.classList.contains('buy')) {
+            event.preventDefault();
+            addToCart(event.target.closest('.feature-item'));
         }
     });
+
+    function addToCart(featureItem) {
+        const productInfo = featureItem.querySelector('.contentBox');
+        // 確保從 featureItem（即包含 data-product-id 屬性的元素）獲取 productId
+        const productId = featureItem.dataset.productId;
+
+        const product = {
+            id: productId, // 直接使用 productId
+            name: productInfo.querySelector('h3').textContent,
+            price: parseFloat(productInfo.querySelector('.price').textContent.replace('$', '')),
+            productImagePath: productInfo.parentNode.querySelector('img').src,
+            quantity: 1
+        };
+
+        const cart = JSON.parse(localStorage.getItem('cart')) || [];
+        const existingProductIndex = cart.findIndex(item => item.id === product.id);
+
+        if (existingProductIndex !== -1) {
+            cart[existingProductIndex].quantity += 1;
+        } else {
+            console.log(`Adding new product to cart with ID: ${product.id}`);
+            cart.push(product);
+        }
+        localStorage.setItem('cart', JSON.stringify(cart));
+        setCyberpunkAlertContent("Success!", "Product added to cart!");
+        showCyberpunkAlert();
+    }
+
+    // 設置彈窗內容
+    function setCyberpunkAlertContent(title, message) {
+        document.getElementById('alertTitle').textContent = title;
+        document.getElementById('alertMessage').textContent = message;
+    }
+
+    // 顯示彈窗
+    function showCyberpunkAlert() {
+        document.getElementById('cyberpunkAlert').style.display = 'flex';
+    }
+
+    // 關閉彈窗
+    function closeCyberpunkAlert() {
+        const alert = document.getElementById('cyberpunkAlert');
+        alert.style.animation = 'fadeOut 0.5s'; // 应用淡出动画
+        alert.addEventListener('animationend', function handler() {
+            alert.style.display = 'none'; // 动画完成后隐藏弹窗
+            alert.style.animation = 'none'; // 重置动画，以便下次显示时可以再次触发淡入动画
+            alert.removeEventListener('animationend', handler); // 移除事件监听，避免重复触发
+        });
+    }
+
+    function setupPageScroll() {
+        const hash = window.location.hash;
+        if (hash === '#features') {
+            $('html, body').animate({
+                scrollTop: $(hash).offset().top
+            }, 500);
+        }
+    }
 
 </script>
 

@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-<head th:replace="~{layouts/hHeader :: head}">
+<head th:replace="~{layouts/sHeader :: head}">
     <style>
         body {
             background: rgb(99, 39, 120)
@@ -85,7 +85,7 @@
     </style>
 </head>
 <body>
-<div th:replace="~{layouts/hHeader :: body}"></div>
+<div th:replace="~{layouts/sHeader :: body}"></div>
 <div class="container rounded bg-white mt-5 mb-5">
     <div class="row">
         <div class="col-md-4 border-right">
@@ -149,7 +149,7 @@
     </div>
 </div>
 
-<div th:replace="~{layouts/hFooter :: body}"></div>
+<div th:replace="~{layouts/sFooter :: body}"></div>
 
 <script>
     function handleProfileImageChange(event) {
