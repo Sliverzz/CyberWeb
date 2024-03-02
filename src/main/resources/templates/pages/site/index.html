@@ -89,19 +89,19 @@
         }
 
         .cyberpunk-alert-content {
-            display: flex; /* 使用 Flexbox 布局 */
-            flex-direction: column; /* 子元素垂直排列 */
-            justify-content: center; /* 垂直居中 */
-            align-items: center; /* 水平居中 */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
             padding: 20px;
             border-radius: 5px;
             min-width: 500px;
             min-height: 500px;
-            text-align: center; /* 确保文本居中，对于部分元素可能需要 */
+            text-align: center;
             background: #111;
-            color: #0f0;
-            text-shadow: 0 0 5px #0f0, 0 0 10px #0f0, 0 0 20px #0f0, 0 0 40px #0f0;
-            box-shadow: 0 0 5px #0f0, 0 0 10px #0f0, 0 0 20px #0f0, 0 0 40px #0f0;
+            color: #00BFFF;
+            text-shadow: 0 0 5px #00f, 0 0 10px #00f, 0 0 20px #00f, 0 0 40px #00f;
+            box-shadow: 0 0 5px #00f, 0 0 10px #00f, 0 0 20px #00f, 0 0 40px #00f;
             position: relative;
             overflow: hidden;
         }
@@ -123,7 +123,7 @@
             margin-top: 20px;
             display: inline-block;
             background: #222;
-            color: #0f0;
+            color: #00BFFF;
             text-shadow: none;
             border-radius: 5px;
             transition: background 0.3s ease;
@@ -155,6 +155,38 @@
             to { opacity: 1; }
         }
 
+        /* Cyberpunk 2077 風格標題 */
+        h2 {
+            color: #fff; /* 白色文字 */
+            text-shadow: 0 0 5px #00ffff, 0 0 10px #00ffff, 0 0 20px #00ffff, 0 0 40px #00ffff, 0 0 80px #00ffff; /* 藍色霓虹效果 */
+            font-family: 'Cyber', sans-serif; /* 使用Cyberpunk風格的字體 */
+            transition: all 0.5s ease-in-out;
+        }
+
+        h2:hover {
+            text-shadow: 0 0 5px #ff6eec, 0 0 10px #ff6eec, 0 0 20px #ff6eec, 0 0 40px #ff6eec, 0 0 80px #ff6eec; /* 滑鼠懸停時改為粉色霓虹效果 */
+        }
+
+        /* 強調部分文字風格 */
+        h2 em {
+            font-style: normal; /* 去除斜體 */
+            color: #ff6eec; /* 保持粉色 */
+            text-shadow: 0 0 5px #00ffff, 0 0 10px #00ffff, 0 0 20px #00ffff, 0 0 40px #ff6eec, 0 0 80px #ff6eec; /* 添加藍色和粉色混合的霓虹效果 */
+        }
+
+        /* 霓虹風格的連結 */
+        .logo {
+            color: #fff; /* 基本文字顏色 */
+            text-decoration: none; /* 移除底線 */
+            font-family: 'Cyber', sans-serif; /* 使用Cyberpunk風格的字體 */
+            text-shadow: 0 0 3px #00ffff, 0 0 5px #00ffff; /* 藍色霓虹效果 */
+            transition: all 0.3s ease-in-out; /* 平滑過渡效果 */
+        }
+
+        .logo:hover {
+            text-shadow: 0 0 5px #ff6eec, 0 0 10px #ff6eec; /* 滑鼠懸停時的粉色霓虹效果 */
+        }
+
     </style>
 
 </head>
@@ -182,7 +214,7 @@
             <div class="col-12">
                 <nav class="main-nav">
                     <!-- ***** Logo Start ***** -->
-                    <a href="/site/index" class="logo">Cyber<em style="color: #ff6eec">Web</em></a>
+                    <a href="/site/index" class="logo">CyberWeb</a>
                     <!-- ***** Logo End ***** -->
                     <!-- ***** Menu Start ***** -->
                     <ul class="nav">
@@ -197,6 +229,8 @@
                         </li>
                         <!-- 登入後顯示的部分 -->
                         <li class="main-button dropdown" sec:authorize="isAuthenticated()">
+                            <!-- 隱藏hashId -->
+                            <span id="userHashId" style="display:none" th:text="${userHashId}"></span>
                             <button class="cyberpunk-btn dropBtn">Welcome, <span sec:authentication="name">User</span></button>
                             <div class="dropdown-content">
                                 <form action="/site/profile" method="get">
@@ -308,11 +342,14 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', async () => {
-        initializeCart();
+        // 獲取隱藏hashId
+        const userHashId = document.getElementById('userHashId').textContent; // 從隱藏元素中獲取userHashId
+        initializeCart(userHashId); // 初始化購物車時傳入userHashId
         await fetchProducts();
         setupPageScroll();
     });
 
+    // 將產品fetch出來
     async function fetchProducts() {
         try {
             const response = await fetch('/product/fetchProducts');
@@ -323,6 +360,7 @@
         }
     }
 
+    // 展示產品
     function displayProducts(products) {
         const productRow = document.getElementById('productRow');
         let newRow = productRow;
@@ -338,6 +376,7 @@
         });
     }
 
+    // 產品顯示格式
     function createProductColDiv(product) {
         const colDiv = document.createElement('div');
         colDiv.className = 'col-lg-4';
@@ -345,7 +384,7 @@
     <ul class="features-items">
         <li class="feature-item" data-product-id="${product.id}">  <!-- 添加data-product-id作為唯一值 -->
             <div class="card">
-                <div class="imgBox">
+                <div class="imgBox" style="height: 320px; width: 320px;">
                     <img src="${product.productImagePath}" alt="${product.name}" class="mouse">
                 </div>
                 <div class="contentBox">
@@ -359,43 +398,45 @@
         return colDiv;
     }
 
-    function initializeCart() {
-        if (!localStorage.getItem('cart')) {
-            localStorage.setItem('cart', JSON.stringify([]));
+    function initializeCart(userHashId) {
+        const cartKey = 'cart_' + userHashId; // 根據用戶hashId構建購物車鍵
+        if (!localStorage.getItem(cartKey)) {
+            localStorage.setItem(cartKey, JSON.stringify([]));
         }
     }
 
     document.addEventListener('click', (event) => {
+        const userHashId = document.getElementById('userHashId').textContent; // 確保在事件處理器中也能獲取到userHashId
         if (event.target.classList.contains('buy')) {
             event.preventDefault();
-            addToCart(event.target.closest('.feature-item'));
+            addToCart(event.target.closest('.feature-item'), userHashId); // 將userHashId傳遞給addToCart函數
         }
     });
 
-    function addToCart(featureItem) {
+    // 加入購物車
+    function addToCart(featureItem, userHashId) {
+        const cartKey = 'cart_' + userHashId; // 使用用戶特定的購物車鍵
         const productInfo = featureItem.querySelector('.contentBox');
-        // 確保從 featureItem（即包含 data-product-id 屬性的元素）獲取 productId
         const productId = featureItem.dataset.productId;
 
         const product = {
-            id: productId, // 直接使用 productId
+            id: productId,
             name: productInfo.querySelector('h3').textContent,
             price: parseFloat(productInfo.querySelector('.price').textContent.replace('$', '')),
             productImagePath: productInfo.parentNode.querySelector('img').src,
             quantity: 1
         };
 
-        const cart = JSON.parse(localStorage.getItem('cart')) || [];
+        const cart = JSON.parse(localStorage.getItem(cartKey)) || [];
         const existingProductIndex = cart.findIndex(item => item.id === product.id);
 
         if (existingProductIndex !== -1) {
             cart[existingProductIndex].quantity += 1;
         } else {
-            console.log(`Adding new product to cart with ID: ${product.id}`);
             cart.push(product);
         }
-        localStorage.setItem('cart', JSON.stringify(cart));
-        setCyberpunkAlertContent("Success!", "Product added to cart!");
+        localStorage.setItem(cartKey, JSON.stringify(cart)); // 更新localStorage時使用用戶特定的鍵
+        setCyberpunkAlertContent("Success!", "Product added to cart!"); // 設置成功訊息，使用英文
         showCyberpunkAlert();
     }
 
@@ -408,19 +449,32 @@
     // 顯示彈窗
     function showCyberpunkAlert() {
         document.getElementById('cyberpunkAlert').style.display = 'flex';
+
+        // 添加鍵盤事件監聽器，用於在按下 ESC 鍵時關閉彈窗
+        document.addEventListener('keydown', handleCloseOnEsc);
+    }
+
+    // 在按下 ESC 鍵時關閉彈窗的事件處理函數
+    function handleCloseOnEsc(event) {
+        if (event.key === 'Escape') { // 如果按下的是 ESC 鍵
+            closeCyberpunkAlert();
+        }
     }
 
     // 關閉彈窗
     function closeCyberpunkAlert() {
         const alert = document.getElementById('cyberpunkAlert');
-        alert.style.animation = 'fadeOut 0.5s'; // 应用淡出动画
+        alert.style.animation = 'fadeOut 0.5s';
         alert.addEventListener('animationend', function handler() {
-            alert.style.display = 'none'; // 动画完成后隐藏弹窗
-            alert.style.animation = 'none'; // 重置动画，以便下次显示时可以再次触发淡入动画
-            alert.removeEventListener('animationend', handler); // 移除事件监听，避免重复触发
+            alert.style.display = 'none';
+            alert.style.animation = 'none';
+            alert.removeEventListener('animationend', handler);
+            // 移除事件監聽器，以避免影響到其他功能
+            document.removeEventListener('keydown', handleCloseOnEsc);
         });
     }
 
+    // 從其他頁面回產品頁的自動導航
     function setupPageScroll() {
         const hash = window.location.hash;
         if (hash === '#features') {
@@ -431,6 +485,5 @@
     }
 
 </script>
-
 </body>
 </html>

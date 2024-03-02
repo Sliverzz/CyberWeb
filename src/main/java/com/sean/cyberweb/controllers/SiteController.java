@@ -22,13 +22,27 @@ public class SiteController {
 
     // 首頁
     @GetMapping("/index")
-    public String home() {
+    public String home(Model model) {
+        User currentUser = userService.getCurrentUser();
+
+        // hashId處理
+        String userHashId = userService.encode(currentUser.getId());
+
+        model.addAttribute("userHashId", userHashId);
+        model.addAttribute("user", currentUser);
         return "/pages/site/index";
     }
 
     // 購物車
     @GetMapping("/cart")
-    public String cart() {
+    public String cart(Model model) {
+        User currentUser = userService.getCurrentUser();
+
+        // hashId處理
+        String userHashId = userService.encode(currentUser.getId());
+
+        model.addAttribute("userHashId", userHashId);
+        model.addAttribute("user", currentUser);
         return "/pages/site/cart";
     }
 

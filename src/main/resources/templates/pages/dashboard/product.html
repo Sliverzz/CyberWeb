@@ -45,7 +45,7 @@
                 <form role="form" id="addProductForm" th:action="@{/product/create}" th:method="post" enctype="multipart/form-data">
                     <div class="mb-3">
                         <label for="productName" class="form-label">Name</label>
-                        <input type="text" class="form-control" id="productName" name="name" style="border: 1px solid #ced4da !important; border-radius: 0.25rem !important; padding: 10px;" required>
+                        <input type="text" class="form-control" id="productName" name="name" style="border: 1px solid #ced4da !important; border-radius: 0.25rem !important; padding: 10px;" maxlength="50" required>
                     </div>
                     <div class="mb-3">
                         <label for="productDescription" class="form-label">Description</label>
@@ -94,7 +94,7 @@
                     <input type="hidden" id="editProductId" name="id">
                     <div class="mb-3">
                         <label for="editProductName" class="form-label">Name</label>
-                        <input type="text" class="form-control" id="editProductName" name="name" style="border: 1px solid #ced4da !important; border-radius: 0.25rem !important; padding: 10px;" required>
+                        <input type="text" class="form-control" id="editProductName" name="name" style="border: 1px solid #ced4da !important; border-radius: 0.25rem !important; padding: 10px;" maxlength="50" required>
                     </div>
                     <div class="mb-3">
                         <label for="editProductDescription" class="form-label">Description</label>
@@ -244,6 +244,16 @@
             }
         })
     }
+
+    // 自動帶入 img nam e作為 product name
+    document.addEventListener("DOMContentLoaded", function() {
+        // 監聽圖片上傳欄位的變化
+        document.getElementById("productImage").addEventListener("change", function(e) {
+            var fileName = e.target.files[0].name; // 獲取文件名稱
+            var nameWithoutExtension = fileName.replace(/\.[^/.]+$/, ""); // 去除檔案擴展名
+            document.getElementById("productName").value = nameWithoutExtension; // 設置名稱到Name欄位
+        });
+    });
 
     document.getElementById('productImage').onchange = function(event) {
         var reader = new FileReader();
