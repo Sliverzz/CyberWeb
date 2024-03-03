@@ -341,10 +341,17 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
+    let shouldRedirectToLogin = false; //重置標記
+
     document.addEventListener('DOMContentLoaded', async () => {
         // 獲取隱藏hashId
-        const userHashId = document.getElementById('userHashId').textContent; // 從隱藏元素中獲取userHashId
-        initializeCart(userHashId); // 初始化購物車時傳入userHashId
+        const userHashIdElement = document.getElementById('userHashId');
+        const userHashId = userHashIdElement ? userHashIdElement.textContent : null;
+
+        // 檢查hashId是否存在
+        if (userHashId) {
+            initializeCart(userHashId); // 如果userHashId存在，初始化購物車。
+        }
         await fetchProducts();
         setupPageScroll();
     });
@@ -360,7 +367,7 @@
         }
     }
 
-    // 展示產品
+    // 展示產品function
     function displayProducts(products) {
         const productRow = document.getElementById('productRow');
         let newRow = productRow;
@@ -398,6 +405,7 @@
         return colDiv;
     }
 
+    // 初始化購物車
     function initializeCart(userHashId) {
         const cartKey = 'cart_' + userHashId; // 根據用戶hashId構建購物車鍵
         if (!localStorage.getItem(cartKey)) {
@@ -406,15 +414,32 @@
     }
 
     document.addEventListener('click', (event) => {
-        const userHashId = document.getElementById('userHashId').textContent; // 確保在事件處理器中也能獲取到userHashId
+        // 檢查userHashId
+        const userHashIdElement = document.getElementById('userHashId');
+        const userHashId = userHashIdElement ? userHashIdElement.textContent : null;
+
         if (event.target.classList.contains('buy')) {
             event.preventDefault();
-            addToCart(event.target.closest('.feature-item'), userHashId); // 將userHashId傳遞給addToCart函數
+            // 如果未登入（userHashId不存在）
+            if (!userHashId) {
+                // 登入提示
+                setCyberpunkAlertContent("Login Required", "Please login to add items to your cart.");
+                showCyberpunkAlert();
+                shouldRedirectToLogin = true; // 設置標記為true，表示需要在關閉彈窗後跳轉
+                return; // 直接返回，不執行添加到購物車的動作
+            }
+            addToCart(event.target.closest('.feature-item'), userHashId); // 将userHashId傳遞给addToCart函數
         }
     });
 
     // 加入購物車
     function addToCart(featureItem, userHashId) {
+        if (!userHashId) {
+            // 如果沒有userHashId，提示請登入
+            console.error('User is not logged in.');
+            return;
+        }
+
         const cartKey = 'cart_' + userHashId; // 使用用戶特定的購物車鍵
         const productInfo = featureItem.querySelector('.contentBox');
         const productId = featureItem.dataset.productId;
@@ -469,8 +494,14 @@
             alert.style.display = 'none';
             alert.style.animation = 'none';
             alert.removeEventListener('animationend', handler);
-            // 移除事件監聽器，以避免影響到其他功能
+            // 移除事件監聽，以避免影響到其他功能
             document.removeEventListener('keydown', handleCloseOnEsc);
+
+            // 檢查是否需要跳轉到登陸頁面
+            if (shouldRedirectToLogin) {
+                window.location.href = "/user/login";
+                shouldRedirectToLogin = false; // 重置標記
+            }
         });
     }
 
