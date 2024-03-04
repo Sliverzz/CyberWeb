@@ -89,3 +89,82 @@
     margin-top: 10px;
     font-size: 1.2em;
 }
+
+/* 購物車數量顯示樣式 */
+.cyberpunk-cart-count {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1em;
+    color: #00BFFF;
+    background-color: #111;
+    padding: 5px 5px;
+    border-radius: 5px;
+    box-shadow: 0 0 5px #00BFFF, 0 0 10px #00BFFF, 0 0 15px #00BFFF;
+    text-shadow: 0 0 5px #00ffff, 0 0 10px #00ffff;
+    display: none; /* 默認不顯示 */
+    opacity: 0; /* 初始透明度為0 */
+    transition: opacity 0.5s ease-in-out; /* 淡入淡出效果 */
+}
+
+.cyberpunk-cart-count.show {
+    display: inline; /* 當顯示時改為內聯顯示 */
+    opacity: 1; /* 完全不透明 */
+}
+
+/* Cyberpunk Style Select */
+.payment-method-select {
+    background: #000; /* Dark background */
+    color: #560bad; /* Neon blue text */
+    border: 1px solid #560bad; /* Neon blue border */
+    border-radius: 5px;
+    padding: 5px 10px;
+    font-family: 'Poppins', sans-serif; /* Assuming Poppins is part of your theme */
+    font-size: 16px;
+    appearance: none; /* Remove default styling */
+    outline: none;
+    cursor: pointer;
+    margin-bottom: 20px; /* Space before the total */
+    width: 125px;
+}
+
+.payment-method-select {
+    background-image: linear-gradient(45deg, transparent 50%, #560bad 50%),
+    linear-gradient(135deg, #560bad 50%, transparent 50%),
+    linear-gradient(to right, #000, #000);
+    background-position: right 0.7em top 50%, right 0.4em top 50%, 100% 0; /* Adjusted */
+    background-size: 5px 5px, 5px 5px, 2.5em 2.5em;
+    background-repeat: no-repeat;
+}
+
+.payment-method-select:hover, .payment-method-select:focus {
+    border-color: #560bad;
+    color: #ff6eec;
+    background-image: linear-gradient(45deg, transparent 50%, #ff6eec 50%),
+    linear-gradient(135deg, #ff6eec 50%, transparent 50%),
+    linear-gradient(to right, #000, #000);
+}
+
+.payment-method-select option {
+    padding: 10px;
+    background: #222;
+    color: #fff;
+}
+
+.payment-method-select.no-arrow {
+    background-image: none;
+}
+
+/* 霓虹風格的連結 */
+.neon-link, .neon-link p {
+    color: #fff; /* 基本文字顏色 */
+    text-decoration: none; /* 移除底線 */
+    font-family: 'Poppins', sans-serif; /* 使用適合的字體 */
+    text-shadow: 0 0 3px #00ffff, 0 0 5px #00ffff, 0 0 10px #00ffff, 0 0 20px #ff6eec, 0 0 40px #ff6eec; /* 添加藍色和粉色混合的霓虹效果 */
+    transition: all 0.3s ease-in-out; /* 平滑過渡效果 */
+    font-size: 20px; /* 增加連結的字體大小 */
+}
+
+.neon-link:hover {
+    color: #ffffff; /* 增加 hover 時的文字顏色亮度 */
+    text-shadow: 0 0 8px #ffffff, 0 0 15px #ff00ff, 0 0 30px #ff00ff, 0 0 60px #ff00ff, 0 0 120px #ff00ff; /* 使用更亮的白色和粉色霓虹效果，並增加模糊半徑 */
+}
+

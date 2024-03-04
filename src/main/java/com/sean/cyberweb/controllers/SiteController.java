@@ -28,7 +28,7 @@ public class SiteController {
         /* 由於首頁與產品頁結合的原因，
          * 產品加入購物車時需要抓取當前currentUser的hashId才能導入對應用戶的購物車，
          * 故此處加入currentUser檢查以便未登入也能進到首頁，
-         * 其餘頁面controller皆已在config中擋掉所有未登入的 "ROLE_USER、ROLE_ADMIN" 以外的權限用戶
+         * 其餘頁面的controller皆已在config中擋掉所有 "ROLE_USER、ROLE_ADMIN" 以外的權限用戶
          */
         if (currentUser != null) {
             String userHashId = userService.encode(currentUser.getId());

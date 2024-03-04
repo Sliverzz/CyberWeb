@@ -20,62 +20,16 @@
 
     <link rel="stylesheet" href="/assets/css/templatemo-training-studio.css">
 
-    <!-- Font Awesome Icons -->
-    <script src="https://kit.fontawesome.com/0a9f356c66.js" crossorigin="anonymous"></script>
+    <!-- CyberWebSite CSS File -->
+    <link rel="stylesheet" type="text/css" href="/assets/css/cyber-web-site.css">
 
     <!-- Cart CSS File -->
     <link rel="stylesheet" type="text/css" href="/assets/css/cart.css">
 
+    <!-- Font Awesome Icons -->
+    <script src="https://kit.fontawesome.com/0a9f356c66.js" crossorigin="anonymous"></script>
+
     <style>
-        /* Dropdown Button */
-        .dropBtn {
-            border: none;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-
-        /* 容器 <li> - 需要定位dropdown content */
-        .dropdown {
-            position: relative;
-            display: inline-block;
-        }
-
-        /* Dropdown Content (隱藏的默認) */
-        .dropdown-content {
-            visibility: hidden;
-            opacity: 0;
-            position: absolute;
-            width: 100%;
-            border-radius: 10px;
-            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-            z-index: 1;
-            transition: visibility 0s, opacity 0.5s linear, transform 0.5s ease-out;
-            transform: translateY(-20px);
-            max-height: 0;
-            overflow: hidden;
-        }
-
-        /* Dropdown Links */
-        .dropdown-content form {
-            padding: 12px 16px;
-            text-decoration: none;
-            display: block;
-        }
-
-        /* 顯示dropdown content當滑鼠懸停在dropdown button上 */
-        .dropdown:hover .dropdown-content {
-            visibility: visible;
-            opacity: 1;
-            transform: translateY(0);
-            max-height: 500px;
-            transition-delay: 0s, 0s, 0s;
-        }
-
-        /* 按鈕和連結的樣式 */
-        .cyberpunk-btn {
-            border: none;
-            cursor: pointer;
-        }
 
     </style>
 </head>
@@ -94,7 +48,6 @@
 </div>
 <!-- ***** Preloader End ***** -->
 
-
 <!-- ***** Header Area Start ***** -->
 <header class="header-area header-sticky">
     <div class="container">
@@ -102,7 +55,7 @@
             <div class="col-12">
                 <nav class="main-nav">
                     <!-- ***** Logo Start ***** -->
-                    <a href="/site/index" class="logo">Cyber<em style="color: #ff6eec">Web</em></a>
+                    <a href="/site/index" class="logo">CyberWeb</a>
                     <!-- ***** Logo End ***** -->
                     <!-- ***** Menu Start ***** -->
                     <ul class="nav">
@@ -160,9 +113,21 @@
                     <!-- Dynamic cart items will be appended here by JavaScript -->
                 </div>
                 <div class="cart-summary">
-                    <span class="summary-title">Total:</span>
-                    <!-- The total price will be dynamically updated by JavaScript -->
-                    <span class="summary-price">$0.00</span>
+                    <!-- Payment Method Selection -->
+                    <div class="payment-method-selection">
+                        <label for="paymentMethod">Payment Method:</label>
+                        <select id="paymentMethod" class="payment-method-select">
+                            <option value="" disabled>Select :</option>
+                            <option value="linePay">LinePay</option>
+                            <option value="paypal">PayPal</option>
+                            <option value="creditCard">Credit Card</option>
+                        </select>
+                    </div>
+                    <div class="total-summary">
+                        <span class="summary-title">Total:</span>
+                        <!-- The total price will be dynamically updated by JavaScript -->
+                        <span class="summary-price">$0.00</span>
+                    </div>
                 </div>
                 <button class="checkout-btn">Checkout</button>
             </div>
@@ -191,23 +156,53 @@
 <script src="/assets/js/custom.js"></script>
 
 <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        // 獲取表單中放好的隱藏hashId
-        const userHashId = document.getElementById('userHashId').textContent;
+    document.addEventListener('DOMContentLoaded', function() {
+        const userHashId = document.getElementById('userHashId') ? document.getElementById('userHashId').textContent : 'default';
         updateCartUI(userHashId); // 頁面加載就更新購物車內容
+        addEventListenersToButtons(userHashId); // 為按鈕添加事件監聽器
+
+        // 檢查並恢復選擇的支付方法
+        var savedPaymentMethod = localStorage.getItem('selectedPaymentMethod');
+        if (savedPaymentMethod) {
+            document.getElementById('paymentMethod').value = savedPaymentMethod;
+        }
+
+        document.getElementById('paymentMethod').addEventListener('change', function() {
+            localStorage.setItem('selectedPaymentMethod', this.value); // 保存選擇到 localStorage
+        });
     });
 
+    // 更新購物車
     function updateCartUI(userHashId) {
-        const cartKey = 'cart_' + userHashId; // 根據user hashId構建購物車鍵
+        const cartKey = 'cart_' + userHashId;
         const cartItems = JSON.parse(localStorage.getItem(cartKey)) || [];
         const cartItemsContainer = document.querySelector('.cart-items');
-        cartItemsContainer.innerHTML = ''; // 清空
+        const paymentMethodSelection = document.querySelector('.payment-method-selection');
+        const totalSummary = document.querySelector('.total-summary');
+        const checkoutButton = document.querySelector('.checkout-btn');
+
+        cartItemsContainer.innerHTML = ''; // 清空購物車項目容器
 
         let total = 0;
-        cartItems.forEach((item, index) => {
-            const cartItemElement = document.createElement('div');
-            cartItemElement.className = 'cart-item';
-            cartItemElement.innerHTML = `
+        if (cartItems.length === 0) {
+            // 購物車為空時隱藏支付方式選擇、總計和結帳按鈕，並顯示提示信息
+            paymentMethodSelection.style.display = 'none';
+            totalSummary.style.display = 'none';
+            checkoutButton.style.display = 'none';
+
+            const emptyCartMessage = document.createElement('div');
+            emptyCartMessage.innerHTML = `<p>Your cart is empty. Please <a href="/site/index#features" class="neon-link">visit our products page</a> to add items.</p>`;
+            cartItemsContainer.appendChild(emptyCartMessage);
+        } else {
+            // 購物車不為空時顯示支付方式選擇、總計和結帳按鈕，並更新購物車項目
+            paymentMethodSelection.style.display = '';
+            totalSummary.style.display = '';
+            checkoutButton.style.display = '';
+
+            cartItems.forEach((item, index) => {
+                const cartItemElement = document.createElement('div');
+                cartItemElement.className = 'cart-item';
+                cartItemElement.innerHTML = `
                 <div class="item-info">
                     <div class="item-image">
                         <img src="${item.productImagePath}" alt="${item.name}">
@@ -227,41 +222,31 @@
                 </div>
                 <button class="item-remove" data-index="${index}">Remove</button>
             `;
-            cartItemsContainer.appendChild(cartItemElement);
-            total += item.price * item.quantity;
-        });
+                cartItemsContainer.appendChild(cartItemElement);
+                total += item.price * item.quantity;
+            });
 
-        // 更新總計
-        const summaryPrice = document.querySelector('.summary-price');
-        summaryPrice.textContent = `$${total.toFixed(2)}`;
-
-        // 為增減、移除按鈕加入事件監聽
-        addEventListenersToButtons(userHashId);
+            // 更新總計信息
+            const summaryPrice = document.querySelector('.summary-price');
+            summaryPrice.textContent = `$${total.toFixed(2)}`;
+        }
     }
 
+    // 按鈕監聽
     function addEventListenersToButtons(userHashId) {
-        document.querySelectorAll('.quantity-increase').forEach(button => {
-            button.addEventListener('click', () => {
-                const index = button.getAttribute('data-index');
-                modifyCartItemQuantity(userHashId, index, true); // 增加數量
-            });
-        });
-
-        document.querySelectorAll('.quantity-decrease').forEach(button => {
-            button.addEventListener('click', () => {
-                const index = button.getAttribute('data-index');
-                modifyCartItemQuantity(userHashId, index, false); // 減少數量
-            });
-        });
-
-        document.querySelectorAll('.item-remove').forEach(button => {
-            button.addEventListener('click', () => {
-                const index = button.getAttribute('data-index');
-                removeCartItem(userHashId, index); // 移除项目
-            });
+        // 確保在動態生成的元素上綁定事件
+        document.querySelector('.cart-items').addEventListener('click', function(e) {
+            if (e.target.className.includes('quantity-increase')) {
+                modifyCartItemQuantity(userHashId, e.target.dataset.index, true);
+            } else if (e.target.className.includes('quantity-decrease')) {
+                modifyCartItemQuantity(userHashId, e.target.dataset.index, false);
+            } else if (e.target.className.includes('item-remove')) {
+                removeCartItem(userHashId, e.target.dataset.index);
+            }
         });
     }
 
+    // 調整購物車產品數量
     function modifyCartItemQuantity(userHashId, index, increase) {
         const cartKey = 'cart_' + userHashId;
         let cartItems = JSON.parse(localStorage.getItem(cartKey));
@@ -276,6 +261,7 @@
         updateCartUI(userHashId); // 重新更新購物車UI
     }
 
+    // 刪除購物車產品
     function removeCartItem(userHashId, index) {
         const cartKey = 'cart_' + userHashId;
         let cartItems = JSON.parse(localStorage.getItem(cartKey));
@@ -283,6 +269,57 @@
         localStorage.setItem(cartKey, JSON.stringify(cartItems));
         updateCartUI(userHashId); // 重新更新購物車UI
     }
+
+    // 結帳入口點
+    document.querySelector('.checkout-btn').addEventListener('click', function() {
+        const selectedPaymentMethod = document.getElementById('paymentMethod').value;
+        if (!selectedPaymentMethod) {
+            alert('Please select a payment method.');
+            return; // Prevent further action if no payment method is selected
+        }
+
+        // Process checkout based on the selected payment method
+        switch (selectedPaymentMethod) {
+            case 'creditCard':
+                // Redirect to Credit Card Payment Controller
+                window.location.href = '/payment/creditCard';
+                break;
+            case 'paypal':
+                // Redirect to PayPal Payment Controller
+                window.location.href = '/payment/paypal';
+                break;
+            case 'linePay':
+                // Redirect to LinePay Payment Controller
+                window.location.href = '/payment/linePay';
+                break;
+            // Add more cases for additional payment methods
+            default:
+                console.error('Unknown payment method.');
+        }
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // 嘗試從 DOM 中獲取用戶 hash ID，如果不存在則使用默認值
+        const userHashId = document.getElementById('userHashId') ? document.getElementById('userHashId').textContent : 'defaultUser';
+        const paymentMethodKey = 'selectedPaymentMethod_' + userHashId; // 使用 userHashId 作為 localStorage 鍵的一部分
+
+        // 檢查 localStorage 中是否有保存的支付方法針對特定用戶
+        var savedPaymentMethod = localStorage.getItem(paymentMethodKey);
+
+        if (savedPaymentMethod) {
+            // 如果有保存的支付方法，則選擇該方法
+            document.getElementById('paymentMethod').value = savedPaymentMethod;
+        } else {
+            // 如果沒有保存的支付方法，則選擇預設的不可選擇選項
+            document.getElementById('paymentMethod').value = '';
+        }
+
+        // 監聽選擇變更事件
+        document.getElementById('paymentMethod').addEventListener('change', function() {
+            // 保存選擇到 localStorage，針對特定用戶
+            localStorage.setItem(paymentMethodKey, this.value);
+        });
+    });
 
 </script>
 </body>
