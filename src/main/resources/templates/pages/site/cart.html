@@ -120,7 +120,6 @@
                             <option value="" disabled>Select :</option>
                             <option value="linePay">LinePay</option>
                             <option value="paypal">PayPal</option>
-                            <option value="creditCard">Credit Card</option>
                         </select>
                     </div>
                     <div class="total-summary">
@@ -232,6 +231,13 @@
         }
     }
 
+    // 清空購物車
+    function clearCart(userHashId) {
+        const cartKey = 'cart_' + userHashId;
+        localStorage.setItem(cartKey, JSON.stringify([])); // 重置購物車
+        updateCartUI();
+    }
+
     // 按鈕監聽
     function addEventListenersToButtons(userHashId) {
         // 確保在動態生成的元素上綁定事件
@@ -270,31 +276,54 @@
         updateCartUI(userHashId); // 重新更新購物車UI
     }
 
-    // 結帳入口點
-    document.querySelector('.checkout-btn').addEventListener('click', function() {
+    // 結帳入口點 - 選擇金流
+    document.querySelector('.checkout-btn').addEventListener('click', async function() {
+        const userHashId = document.getElementById('userHashId') ? document.getElementById('userHashId').textContent : 'defaultUser';
         const selectedPaymentMethod = document.getElementById('paymentMethod').value;
         if (!selectedPaymentMethod) {
             alert('Please select a payment method.');
-            return; // Prevent further action if no payment method is selected
+            return; // 阻止無選擇提交
         }
 
-        // Process checkout based on the selected payment method
-        switch (selectedPaymentMethod) {
-            case 'creditCard':
-                // Redirect to Credit Card Payment Controller
-                window.location.href = '/payment/creditCard';
-                break;
-            case 'paypal':
-                // Redirect to PayPal Payment Controller
-                window.location.href = '/payment/paypal';
-                break;
-            case 'linePay':
-                // Redirect to LinePay Payment Controller
-                window.location.href = '/payment/linePay';
-                break;
-            // Add more cases for additional payment methods
-            default:
-                console.error('Unknown payment method.');
+        // 從localStorage獲取購物車內的產品資訊
+        const cartKey = 'cart_' + userHashId;
+        const cartItems = JSON.parse(localStorage.getItem(cartKey)) || [];
+
+        if (cartItems.length === 0) {
+            alert('Your cart is empty.');
+            return; // 如果購物車是空的，則不進行後續操作
+        }
+
+        try {
+            // 發送POST請求到後端，包含用戶選擇的支付方式和購物車內的產品資訊
+            const response = await fetch('/payment/checkout', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    userHashId: userHashId,
+                    paymentMethod: selectedPaymentMethod,
+                    cartItems: cartItems
+                }),
+            });
+
+            const data = await response.json();
+            if (data && data.paymentUrl) {
+                // 清空購物車
+                clearCart(userHashId);
+
+                // 如果後端響應包含了支付URL，則重定向用戶到該URL
+                window.location.href = data.paymentUrl;
+            } else {
+                // 失敗也要清空購物車因為訂單已建立
+                clearCart(userHashId);
+
+                alert('Failed to initiate payment. Please try again.');
+            }
+        } catch (error) {
+            console.error('Checkout error:', error);
+            alert('Error processing checkout. Please try again.');
         }
     });
 

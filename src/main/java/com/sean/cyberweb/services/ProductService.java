@@ -46,6 +46,7 @@ public class ProductService {
         productRepository.deleteById(id);
     }
 
+    // 儲存或更新
     public void saveOrUpdateProduct(Product product, MultipartFile file) throws IOException {
         Product targetProduct = product;
 

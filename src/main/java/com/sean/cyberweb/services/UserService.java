@@ -121,11 +121,11 @@ public class UserService {
         userRepository.save(user);
     }
 
-    // hashId
+    // 加密hash
     public String encode(Long id) {
         return hashids.encode(id);
     }
-
+    // 解密hash
     public Long decode(String hash) {
         long[] ids = hashids.decode(hash);
         return ids.length > 0 ? ids[0] : null;
