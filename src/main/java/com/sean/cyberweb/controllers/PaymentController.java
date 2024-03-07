@@ -1,11 +1,11 @@
 package com.sean.cyberweb.controllers;
 
 import com.sean.cyberweb.domain.Order;
-import com.sean.cyberweb.dto.CartItem;
+import com.sean.cyberweb.dto.CartItemDto;
 import com.sean.cyberweb.services.OrderService;
 import com.sean.cyberweb.services.PaymentService;
 import com.sean.cyberweb.services.PaymentServiceFactory;
-import com.sean.cyberweb.dto.CheckoutRequest;
+import com.sean.cyberweb.dto.CheckoutRequestDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -28,14 +28,14 @@ public class PaymentController {
 
     // 結單 -> 付款
     @PostMapping("/checkout")
-    public ResponseEntity<?> checkout(@RequestBody CheckoutRequest checkoutRequest) {
+    public ResponseEntity<?> checkout(@RequestBody CheckoutRequestDto checkoutRequestDTO) {
         try {
             // 1. 從請求中提取支付方法和購物車項目
-            String paymentMethod = checkoutRequest.getPaymentMethod();
-            List<CartItem> cartItems = checkoutRequest.getCartItems();
+            String paymentMethod = checkoutRequestDTO.getPaymentMethod();
+            List<CartItemDto> cartItems = checkoutRequestDTO.getCartItems();
 
             // 2. 創建訂單
-            Order order = orderService.createOrder(cartItems, checkoutRequest.getUserHashId());
+            Order order = orderService.createOrder(cartItems, checkoutRequestDTO.getUserHashId());
 
             // 3. 根據支付方法，獲取對應的支付服務
             PaymentService paymentService = paymentServiceFactory.getPaymentService(paymentMethod);

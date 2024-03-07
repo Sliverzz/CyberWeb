@@ -39,3 +39,13 @@
     border-color: #66afe9; /* 焦點時的邊框顏色 */
     box-shadow: 0 0 8px rgba(102, 175, 233, 0.6); /* 焦點時的陰影效果 */
 }
+
+/* 排序指針 */
+table.dataTable thead .sorting:hover,
+table.dataTable thead .sorting_asc:hover,
+table.dataTable thead .sorting_desc:hover {
+    cursor: pointer;
+    text-decoration: underline;
+    text-decoration-color: #66afe9; /* 只在hover時顯示對應顏色下底線 */
+    color: #66afe9; /* 改變顏色 */
+}

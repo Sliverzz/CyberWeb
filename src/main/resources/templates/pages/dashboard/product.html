@@ -134,47 +134,46 @@
 <script src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
 <script>
     // Datatable
-    $(document).ready(function () {
+    $(document).ready(function() {
         $('#productTable').DataTable({
             "processing": true,
-            "serverSide": true,
+            "serverSide": false,
             "ajax": {
-                "url": "/product/list",
-                "type": "GET"
+                "url": "/product/listAll",
+                "type": "GET",
+                "dataSrc": "" // 數據原屬性為空字串，告訴 DataTables 期望的是json格式的資料
             },
-            "pageLength": 5,
-            "pagingType": "simple_numbers",
-            "lengthMenu": [ [5, 10, 20, -1], [5, 10, 20, "All"] ],
-            "scrollY": "400px",
-            "scrollCollapse": true,
-            "paging": true,
+            "pageLength": 5, // 初始每頁顯示五筆資料
+            "pagingType": "simple_numbers", // 分頁類型
+            "lengthMenu": [ [5, 10, 15, -1], [5, 10, 15, "All"] ], // 自定義分頁
+            "scrollY": "400px", // 啟用垂直滾動
+            "scrollCollapse": true, // 允許表格高度縮減
+            "paging": true, // 分頁
             "columns": [
-                {"data": "name"},
-                {"data": "description"},
-                {"data": "price"},
-                {"data": "stock"},
+                { "data": "name" },
+                { "data": "description" },
+                { "data": "price" },
+                { "data": "stock" },
                 {
                     "data": "status",
-                    "render": function (data, type, row, meta) {
-                        if (data) {
-                            return '<span class="text-success"><i class="fa fa-circle"></i> On</span>'; // 使用 Font Awesome 或其他圖標
-                        } else {
-                            return '<span class="text-danger"><i class="fa fa-circle"></i> Off</span>';
-                        }
+                    "render": function(data, type, row) {
+                        return data ? '<span class="text-success"><i class="fa fa-circle"></i> On</span>' :
+                            '<span class="text-danger"><i class="fa fa-circle"></i> Off</span>';
                     }
                 },
                 {
                     "data": "id",
-                    "render": function (data, type, row, meta) {
-                        return '<button class="btn btn-primary profile-button" style="margin-top: 15px" onclick="getProductInfo(' + data + ')">Edit</button>' + " " +
-                            '<button class="btn btn-danger profile-button" style="margin-top: 15px" onclick="deleteProduct(' + data + ')">Delete</button>';
+                    "orderable": false,
+                    "render": function(data, type, row) {
+                        return '<button class="btn btn-primary profile-button" style="margin-top: 15px" onclick="getProductInfo(' + data + ')">Edit</button>' +
+                            ' <button class="btn btn-danger profile-button" style="margin-top: 15px" onclick="deleteProduct(' + data + ')">Delete</button>';
                     }
                 }
             ],
             "language": {
                 "paginate": {
-                    "previous": "<i class=\"fa-solid fa-left-long\"></i>",
-                    "next": "<i class=\"fa-solid fa-right-long\"></i>"
+                    "previous": "<i class='fa fa-arrow-left'></i>",
+                    "next": "<i class='fa fa-arrow-right'></i>"
                 }
             }
         });
@@ -245,7 +244,7 @@
         })
     }
 
-    // 自動帶入 img nam e作為 product name
+    // 自動帶入 img name作為 product name
     document.addEventListener("DOMContentLoaded", function() {
         // 監聽圖片上傳欄位的變化
         document.getElementById("productImage").addEventListener("change", function(e) {

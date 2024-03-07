@@ -15,6 +15,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 
+import java.util.List;
+
 @Service
 public class ProductService {
 
@@ -26,8 +28,8 @@ public class ProductService {
         this.productRepository = productRepository;
     }
 
-    public Page<Product> findAll(PageRequest pageRequest) {
-        return productRepository.findAll(pageRequest);
+    public List<Product> findAll() {
+        return productRepository.findAll();
     }
 
     public Page<Product> findAllActiveProducts(Pageable pageable) {

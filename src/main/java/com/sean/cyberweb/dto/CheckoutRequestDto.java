@@ -7,8 +7,8 @@ import java.util.List;
 
 @Setter
 @Getter
-public class CheckoutRequest {
+public class CheckoutRequestDto {
     private String paymentMethod;
     private String userHashId;
-    private List<CartItem> cartItems;
+    private List<CartItemDto> cartItems;
 }

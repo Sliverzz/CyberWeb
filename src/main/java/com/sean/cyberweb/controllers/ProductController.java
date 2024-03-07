@@ -15,13 +15,8 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
 @Controller
 @RequestMapping("/product")
@@ -34,24 +29,10 @@ public class ProductController {
         this.productService = productService;
     }
 
-    @GetMapping("/list")
-    public ResponseEntity<Map<String, Object>> listProducts(@RequestParam("draw") int draw,
-                                                            @RequestParam("start") int start,
-                                                            @RequestParam("length") int length,
-                                                            @RequestParam(value = "search[value]", defaultValue = "") String searchValue) {
-        int pageSize = length == -1 ? Integer.MAX_VALUE : length;
-        PageRequest pageRequest = PageRequest.of(start / pageSize, pageSize);
-        Page<Product> productPage = searchValue.isEmpty() ?
-                productService.findAll(pageRequest) :
-                productService.findByNameContainingIgnoreCase(searchValue, pageRequest);
-
-        Map<String, Object> data = new HashMap<>();
-        data.put("draw", draw);
-        data.put("recordsTotal", productPage.getTotalElements());
-        data.put("recordsFiltered", productPage.getTotalElements());
-        data.put("data", productPage.getContent());
-
-        return ResponseEntity.ok(data);
+    @GetMapping("/listAll")
+    public ResponseEntity<List<Product>> listAllProducts() {
+        List<Product> products = productService.findAll();
+        return ResponseEntity.ok(products);
     }
 
     @PostMapping("/create")

@@ -8,6 +8,249 @@
 <body>
 <div th:replace="~{layouts/dHeader :: body}"></div>
 
+<!-- Datatables產品表格 -->
+<div class="container rounded bg-white mt-5 mb-5">
+    <table id="orderTable" class="display" style="width:100%">
+        <thead>
+        <tr>
+            <th>Order Number</th>
+            <th>Total Price</th>
+            <th>Status</th>
+            <th>Date Created</th>
+            <th>Last Updated</th>
+            <th>Option</th>
+        </tr>
+        </thead>
+        <tbody>
+        <!-- 數據由 DataTables 動態載入 -->
+        </tbody>
+    </table>
+</div>
+
+<!-- 編輯訂單的Modal -->
+<div class="modal fade" id="editOrderModal" tabindex="-1" aria-labelledby="editOrderModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editOrderModalLabel">Edit Order</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editOrderForm">
+                    <input type="hidden" id="editOrderId" name="id">
+                    <div class="mb-3">
+                        <label for="editOrderNumber" class="form-label">Order Number</label>
+                        <input type="text" class="form-control" style="border: 1px solid #ced4da !important; border-radius: 0.25rem !important; padding: 10px;" id="editOrderNumber" name="orderNumber" disabled>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editOrderTotalPrice" class="form-label">Total Price</label>
+                        <input type="number" class="form-control" style="border: 1px solid #ced4da !important; border-radius: 0.25rem !important; padding: 10px;" id="editOrderTotalPrice" name="totalPrice" disabled>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editOrderStatus" class="form-label">Status</label>
+                        <select class="form-select" id="editOrderStatus" name="status" required>
+                            <option value="PROCESSING">Processing</option>
+                            <option value="SHIPPED">Shipped</option>
+                            <option value="DELIVERED">Delivered</option>
+                        </select>
+                    </div>
+                    <!-- orderItem顯示區域 -->
+                    <div class="mb-3">
+                        <label class="form-label">Order Items</label>
+                        <div id="editOrderItemsContainer" class="container">
+                            <!-- 訂單項目動態填充於此 -->
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" data-bs-dismiss="modal" style="background-color: #1968ff">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div th:replace="~{layouts/dFooter :: body}"></div>
+
+<!-- datatable -->
+<script src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
+<script>
+    // Datatable
+    $(document).ready(function() {
+        $('#orderTable').DataTable({
+            "processing": true,
+            "serverSide": false,
+            "ajax": {
+                "url": "/order/listAll",
+                "type": "GET",
+                "dataSrc": ""
+            },
+            "columns": [
+                { "data": "orderNumber" }, // 訂單編號
+                { "data": "totalPrice" }, // 訂單總價
+                { "data": "status" }, // 訂單狀態
+                { "data": "dateCreated" }, // 創建時間
+                { "data": "lastUpdated" }, // 最後更新時間
+                {
+                    "data": "id", // 使用訂單ID作為識別
+                    "render": function(data, type, row) {
+                        // 返回带有onclick事件的按钮HTML字符串
+                        return '<button class="btn btn-primary profile-button" style="margin-top: 15px" onclick="getOrderInfo(' + data + ')">Edit</button>';
+                    },
+                    "orderable": false // 禁用排序
+                }
+            ],
+            "language": {
+                "paginate": {
+                    "previous": "<i class='fa fa-arrow-left'></i>",
+                    "next": "<i class='fa fa-arrow-right'></i>"
+                }
+            }
+        });
+    });
+
+    // 編輯訂單
+    function getOrderInfo(orderId) {
+        $.get("/order/getOrderInfo", { id: orderId })
+            .done(function(data) {
+                // 填充基本訂單信息
+                $('#editOrderId').val(data.id);
+                $('#editOrderNumber').val(data.orderNumber);
+                $('#editOrderTotalPrice').val(data.totalPrice);
+                $('#editOrderStatus').val(data.status);
+
+                // 清空舊的訂單項目資訊
+                $('#editOrderItemsContainer').empty();
+
+                // 為每個訂單項目生成HTML，並加入到容器中
+                data.orderItems.forEach(function(item) {
+                    var orderItemHTML = `
+                    <div class="row mb-2 order-item" data-item-id="${item.id}">
+                        <div class="col">
+                            <input type="hidden" name="productId" value="${item.productId}">
+                            <label class="form-label">Name</label>
+                            <input type="text" name="productName" class="form-control" value="${item.productName}" title="${item.productName}" disabled>
+                        </div>
+                        <div class="col">
+                            <label class="form-label">Quantity</label>
+                            <input type="number" class="form-control" name="quantity" value="${item.quantity}" min="1">
+                        </div>
+                        <div class="col">
+                            <label class="form-label">Price</label>
+                            <input type="text" name="price" class="form-control" value="${item.price}" disabled>
+                        </div>
+                        <div class="col">
+                            <label class="form-label">Remove</label>
+                            <button type="button" class="form-control btn btn-danger remove-item-btn">Remove</button>
+                        </div>
+                    </div>
+                    `;
+                    $('#editOrderItemsContainer').append(orderItemHTML);
+                });
+
+                // 顯示Modal
+                $('#editOrderModal').modal('show');
+            });
+    }
+
+    // 監聽數量修改計算總價
+    $('#editOrderItemsContainer').on('change', 'input[name="quantity"]', function() {
+        updateTotalPrice();
+    });
+
+    // 移除後更新總價
+    $('#editOrderItemsContainer').on('click', '.remove-item-btn', function() {
+        $(this).closest('.row').remove();
+        updateTotalPrice();
+    });
+
+    // 動態更新編輯表單的TotalPrice
+    function updateTotalPrice() {
+        let total = 0;
+        $('#editOrderItemsContainer .order-item').each(function() {
+            const quantity = parseInt($(this).find('input[name="quantity"]').val());
+            const price = parseInt($(this).find('input[name="price"]').val());
+            total += quantity * price;
+        });
+        $('#editOrderTotalPrice').val(total);
+    }
+
+    // 編輯表單提交js
+    $(document).ready(function() {
+        // 當編輯表單提交時執行
+        $('#editOrderForm').on('submit', function(e) {
+            e.preventDefault(); // 阻止預設提交改有js控管
+
+            // 初始化
+            var orderItemsArray = [];
+
+            // 迭代所有訂單項目
+            $('.order-item').each(function() {
+                var itemId = $(this).data('item-id');
+                var productId = $(this).find('input[name="productId"]').val();
+                var productName = $(this).find('input[name="productName"]').val();
+                var quantity = $(this).find('input[name="quantity"]').val();
+                var price = $(this).find('input[name="price"]').val();
+
+                orderItemsArray.push({
+                    id: itemId,
+                    productId: productId, // 确保包含 productId
+                    productName: productName,
+                    quantity: parseInt(quantity, 10),
+                    price: price
+                });
+            });
+
+            // 創建 orderDto，內含所有收集的訂單項數據
+            var orderDto = {
+                id: $('#editOrderId').val(),
+                orderNumber: $('#editOrderNumber').val(),
+                totalPrice: $('#editOrderTotalPrice').val(),
+                status: $('#editOrderStatus').val(),
+                orderItems: orderItemsArray
+            };
+            console.log(orderDto);
+
+            // 傳json
+            $.ajax({
+                url: '/order/update',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(orderDto), // 將js對象轉換為字串
+                success: function(response) {
+                    // 成功處理
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Order updated successfully',
+                        confirmButtonText: 'OK'
+                    });
+                },
+                error: function(xhr, status, error) {
+                    // 錯誤處理
+                    var errorMsg = xhr.status + ': ' + xhr.statusText;
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'An error occurred',
+                        text: 'Failed to update the order. Error: ' + errorMsg,
+                        confirmButtonText: 'Close'
+                    });
+                }
+            });
+        });
+    });
+
+    // 產品圖片顯示 - 暫時用不到
+    // document.getElementById('productImage').onchange = function(event) {
+    //     var reader = new FileReader();
+    //     reader.onload = function() {
+    //         var output = document.getElementById('imagePreview');
+    //         output.src = reader.result;
+    //         output.style.display = 'block'; // 顯示圖片預覽
+    //     };
+    //     reader.readAsDataURL(event.target.files[0]);
+    // };
+
+</script>
 </body>
 </html>

@@ -7,7 +7,7 @@ import java.math.BigDecimal;
 
 @Setter
 @Getter
-public class CartItem {
+public class CartItemDto {
     private Long id;
     private String name;
     private BigDecimal price;
