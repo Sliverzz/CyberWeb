@@ -14,5 +14,8 @@ public class OrderDto {
     private String orderNumber;
     private BigDecimal totalPrice;
     private String status;
+    private String dateCreated; // 創建時間(供前端時間格式顯示)
+    private String lastUpdated; // 最後更新時間(供前端時間格式顯示)
+    private String lastUpdateUser; // 最後更新人(供前端顯示使用)
     private List<OrderItemDto> orderItems = new ArrayList<>();
 }

@@ -45,6 +45,18 @@ public class Order {
     @Column(name = "last_updated", nullable = false)
     private LocalDateTime lastUpdated; // 最後更新時間
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "last_update_user_id")
+    private User lastUpdateUser; // 最後更新人
+
+    // 取得最後更新人name
+    public String getLastUpdateUserName() {
+        if (lastUpdateUser != null) {
+            return  lastUpdateUser.getLastName() + " " + lastUpdateUser.getFirstName();
+        }
+        return null;
+    }
+
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonIgnoreProperties("order")
     private Set<OrderItem> orderItems = new HashSet<>();

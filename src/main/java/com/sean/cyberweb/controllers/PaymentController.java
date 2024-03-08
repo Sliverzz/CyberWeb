@@ -2,11 +2,13 @@ package com.sean.cyberweb.controllers;
 
 import com.sean.cyberweb.domain.Order;
 import com.sean.cyberweb.dto.CartItemDto;
+import com.sean.cyberweb.exception.StockShortageException;
 import com.sean.cyberweb.services.OrderService;
 import com.sean.cyberweb.services.PaymentService;
 import com.sean.cyberweb.services.PaymentServiceFactory;
 import com.sean.cyberweb.dto.CheckoutRequestDto;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -45,9 +47,13 @@ public class PaymentController {
 
             // 5. 返回支付URL
             return ResponseEntity.ok(Map.of("paymentUrl", paymentUrl));
+        } catch (StockShortageException e) {
+            // 庫存不足exception
+            return ResponseEntity.badRequest().body(Map.of("error", "stockShortage", "message", e.getMessage()));
         } catch (Exception e) {
+            // 其他異常
             e.printStackTrace();
-            return ResponseEntity.badRequest().body("Error processing checkout request.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error processing checkout request.");
         }
     }
 }

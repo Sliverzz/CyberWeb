@@ -154,6 +154,9 @@
 <!-- Global Init -->
 <script src="/assets/js/custom.js"></script>
 
+<!-- swl2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const userHashId = document.getElementById('userHashId') ? document.getElementById('userHashId').textContent : 'default';
@@ -281,7 +284,7 @@
         const userHashId = document.getElementById('userHashId') ? document.getElementById('userHashId').textContent : 'defaultUser';
         const selectedPaymentMethod = document.getElementById('paymentMethod').value;
         if (!selectedPaymentMethod) {
-            alert('Please select a payment method.');
+            alert('Please select a payment method.'); // "請選擇一種支付方式。"
             return; // 阻止無選擇提交
         }
 
@@ -290,12 +293,11 @@
         const cartItems = JSON.parse(localStorage.getItem(cartKey)) || [];
 
         if (cartItems.length === 0) {
-            alert('Your cart is empty.');
+            alert('Your cart is empty.'); // "您的購物車是空的。"
             return; // 如果購物車是空的，則不進行後續操作
         }
 
         try {
-            // 發送POST請求到後端，包含用戶選擇的支付方式和購物車內的產品資訊
             const response = await fetch('/payment/checkout', {
                 method: 'POST',
                 headers: {
@@ -308,22 +310,37 @@
                 }),
             });
 
+            if (!response.ok) {
+                // 如果響應狀態不是 OK，則將響應轉為 JSON 並拋出錯誤
+                const errorData = await response.json();
+                throw errorData;
+            }
+
             const data = await response.json();
             if (data && data.paymentUrl) {
-                // 清空購物車
-                clearCart(userHashId);
-
-                // 如果後端響應包含了支付URL，則重定向用戶到該URL
-                window.location.href = data.paymentUrl;
+                clearCart(userHashId); // 清空購物車
+                window.location.href = data.paymentUrl; // 重定向到支付URL
             } else {
-                // 失敗也要清空購物車因為訂單已建立
-                clearCart(userHashId);
-
-                alert('Failed to initiate payment. Please try again.');
+                throw new Error('Failed to get the payment URL, please try again.'); // "無法獲取支付 URL，請重試。"
             }
-        } catch (error) {
-            console.error('Checkout error:', error);
-            alert('Error processing checkout. Please try again.');
+        } catch (errorData) {
+            // 處理來自後端的錯誤或其他捕獲的錯誤
+            if (errorData.error === 'stockShortage') {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Stock Shortage', // "庫存不足"
+                    html: errorData.message.replace(/\n/g, '<br>'), // 使用 HTML 属性并将换行符替换为 <br>
+                    confirmButtonText: 'Close' // "關閉"
+                });
+            } else {
+                // 顯示通用錯誤信息
+                Swal.fire({
+                    icon: 'error',
+                    title: 'An error occurred', // "發生錯誤"
+                    text: 'Error processing checkout. Please try again.', // "處理結帳時出現錯誤，請再試一次。"
+                    confirmButtonText: 'Close' // "關閉"
+                });
+            }
         }
     });
 

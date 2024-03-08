@@ -18,6 +18,7 @@
             <th>Status</th>
             <th>Date Created</th>
             <th>Last Updated</th>
+            <th>Last Update User</th>
             <th>Option</th>
         </tr>
         </thead>
@@ -92,6 +93,18 @@
                 { "data": "status" }, // 訂單狀態
                 { "data": "dateCreated" }, // 創建時間
                 { "data": "lastUpdated" }, // 最後更新時間
+                {
+                    "data": "lastUpdateUser", // 最後更新人
+                    "render": function(data, type, row) {
+                        if (data) {
+                            // 有值時
+                            return '<span style="color: #66afe9; text-decoration: underline;">' + data + '</span>';
+                        } else {
+                            // null時
+                            return '<span style="color: gray;">Not updated yet</span>';
+                        }
+                    }
+                },
                 {
                     "data": "id", // 使用訂單ID作為識別
                     "render": function(data, type, row) {
@@ -227,14 +240,25 @@
                     });
                 },
                 error: function(xhr, status, error) {
-                    // 錯誤處理
-                    var errorMsg = xhr.status + ': ' + xhr.statusText;
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'An error occurred',
-                        text: 'Failed to update the order. Error: ' + errorMsg,
-                        confirmButtonText: 'Close'
-                    });
+                    var responseJson = xhr.responseJSON;
+                    if (responseJson.error === "stockShortage") {
+                        // 庫存不足處理
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Stock Shortage', // "庫存不足"
+                            html: responseJson.message.replace(/\n/g, '<br>'), // 替換後端傳回換行符號: "\n" --> "<br>"
+                            confirmButtonText: 'Close' // "關閉"
+                        });
+                    } else {
+                        // 其他錯誤通用處理
+                        var errorMsg = xhr.status + ': ' + xhr.statusText;
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'An error occurred',
+                            text: 'Failed to update the order. Error: ' + errorMsg,
+                            confirmButtonText: 'Close'
+                        });
+                    }
                 }
             });
         });

@@ -30,6 +30,16 @@
     <script src="https://kit.fontawesome.com/0a9f356c66.js" crossorigin="anonymous"></script>
 
     <style>
+        .sold-out {
+            background-color: #d9534f; /* 深红色背景 */
+            color: white;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 14px;
+            display: inline-block;
+            margin-top: 10px;
+            font-weight: bold;
+        }
 
     </style>
 
@@ -237,21 +247,23 @@
     function createProductColDiv(product) {
         const colDiv = document.createElement('div');
         colDiv.className = 'col-lg-4';
+        let buyNowOrSoldOutHtml = product.stock > 0 ? `<a href="#" class="buy">Buy Now</a>` : `<span class="sold-out">Sold Out</span>`;
         colDiv.innerHTML = `
-        <ul class="features-items">
-            <li class="feature-item" data-product-id="${product.id}">
-                <div class="card">
-                    <div class="imgBox" style="height: 320px; width: 320px;">
-                        <img src="${product.productImagePath}" alt="${product.name}" class="mouse">
-                    </div>
-                    <div class="contentBox">
-                        <h3>${product.name}</h3>
-                        <h2 class="price">$${product.price}</h2>
-                        <a href="#" class="buy">Buy Now</a>
-                    </div>
+    <ul class="features-items">
+        <li class="feature-item" data-product-id="${product.id}">
+            <div class="card">
+                <div class="imgBox" style="height: 320px; width: 320px;">
+                    <img src="${product.productImagePath}" alt="${product.name}" class="mouse">
                 </div>
-            </li>
-        </ul>`;
+                <div class="contentBox">
+                    <h3>${product.name}</h3>
+                    <h2 class="price">$${product.price}</h2>
+                    <p class="stock">Stock: ${product.stock}</p>
+                    ${buyNowOrSoldOutHtml}
+                </div>
+            </div>
+        </li>
+    </ul>`;
         return colDiv;
     }
 

@@ -3,9 +3,11 @@ package com.sean.cyberweb.services;
 import com.sean.cyberweb.domain.Order;
 import com.sean.cyberweb.domain.OrderItem;
 import com.sean.cyberweb.domain.Product;
+import com.sean.cyberweb.domain.User;
 import com.sean.cyberweb.dto.CartItemDto;
 import com.sean.cyberweb.dto.OrderDto;
 import com.sean.cyberweb.dto.OrderItemDto;
+import com.sean.cyberweb.exception.StockShortageException;
 import com.sean.cyberweb.repository.OrderItemRepository;
 import com.sean.cyberweb.repository.OrderRepository;
 import com.sean.cyberweb.repository.ProductRepository;
@@ -16,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -41,7 +44,6 @@ public class OrderService {
     // 創建訂單
     @Transactional
     public Order createOrder(List<CartItemDto> cartItems, String userHashId) {
-
         // 解密後儲存id
         Long userId = userService.decode(userHashId);
         if (userId == null) {
@@ -67,6 +69,11 @@ public class OrderService {
             Product product = productRepository.findById(cartItem.getId())
                     .orElseThrow(() -> new IllegalArgumentException("Product with ID " + cartItem.getId() + " not found"));
 
+            // 檢查庫存量
+            if (cartItem.getQuantity() > product.getStock()) {
+                throw new StockShortageException(product.getName(), product.getStock());
+            }
+
             OrderItem orderItem = new OrderItem();
             orderItem.setOrder(newOrder); // 關聯到訂單
             orderItem.setProduct(product);
@@ -76,6 +83,10 @@ public class OrderService {
             totalPrice = totalPrice.add(cartItem.getPrice().multiply(new BigDecimal(cartItem.getQuantity())));
 
             newOrder.getOrderItems().add(orderItem); // 將訂單項目加到訂單中
+
+            // 減去庫存量
+            product.setStock(product.getStock() - cartItem.getQuantity());
+            productRepository.save(product);
         }
 
         // 設置total price
@@ -86,8 +97,24 @@ public class OrderService {
     }
 
     // 查詢所有訂單
-    public Page<Order> findAll(Pageable pageable) {
-        return orderRepository.findAll(pageable);
+    public Page<OrderDto> findAll(Pageable pageable) {
+        Page<Order> orderPage = orderRepository.findAll(pageable);
+        // CyberWeb 統一時間格式 "yyyy-MM-dd HH:mm:ss"
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+        Page<OrderDto> dtoPage = orderPage.map(order -> {
+            OrderDto dto = new OrderDto();
+            dto.setId(order.getId());
+            dto.setOrderNumber(order.getOrderNumber());
+            dto.setStatus(order.getStatus().toString());
+            dto.setTotalPrice(order.getTotalPrice());
+            dto.setDateCreated(order.getDateCreated().format(formatter));
+            dto.setLastUpdated(order.getLastUpdated().format(formatter));
+            dto.setLastUpdateUser(order.getLastUpdateUserName());
+            return dto;
+        });
+
+        return dtoPage;
     }
 
     // id查訂單
@@ -102,46 +129,62 @@ public class OrderService {
 
     // 更新訂單
     @Transactional
-    public Order updateOrder(OrderDto orderDto) {
+    public Order updateOrder(OrderDto orderDto, User currentUser) {
         Order order = orderRepository.findById(orderDto.getId())
-                .orElseThrow(() -> new IllegalStateException("訂單ID " + orderDto.getId() + " 不存在。"));
+                .orElseThrow(() -> new IllegalStateException("productId " + orderDto.getId() + " not exist."));
 
-        // 更新訂單基本信息
         order.setOrderNumber(orderDto.getOrderNumber());
         order.setTotalPrice(orderDto.getTotalPrice());
         order.setStatus(Order.OrderStatus.valueOf(orderDto.getStatus()));
+        order.setLastUpdateUser(currentUser);
 
-        // 獲取前端傳來的訂單項目ID集合
         Set<Long> incomingItemIds = orderDto.getOrderItems().stream()
                 .map(OrderItemDto::getId)
                 .collect(Collectors.toSet());
 
-        // 移除不存在於前端傳來列表中的訂單項目
+        // 移除不存在於前端傳來列表中的訂單項目，并補回相應的庫存
         List<OrderItem> toRemove = order.getOrderItems().stream()
                 .filter(item -> !incomingItemIds.contains(item.getId()))
                 .toList();
         toRemove.forEach(item -> {
+            Product product = item.getProduct();
+            int removedQuantity = item.getQuantity();
+
+            // 將删除的订单项数量加回产品库存
+            product.setStock(product.getStock() + removedQuantity);
+            productRepository.save(product);
+
             order.getOrderItems().remove(item);
             orderItemRepository.delete(item);
         });
 
         // 處理更新或新增的訂單項目
         orderDto.getOrderItems().forEach(itemDto -> {
+            Product product = productRepository.findById(itemDto.getProductId())
+                    .orElseThrow(() -> new IllegalStateException("productId " + itemDto.getProductId() + " not exist."));
+
             OrderItem orderItem = order.getOrderItems().stream()
                     .filter(item -> item.getId() != null && item.getId().equals(itemDto.getId()))
                     .findFirst()
-                    .orElseGet(() -> {
-                        OrderItem newItem = new OrderItem();
-                        newItem.setOrder(order);
-                        return newItem;
-                    });
+                    .orElseGet(OrderItem::new);
 
-            orderItem.setQuantity(itemDto.getQuantity());
+            int originalQuantity = orderItem.getId() != null ? orderItem.getQuantity() : 0;
+            int newQuantity = itemDto.getQuantity();
+            int quantityDifference = newQuantity - originalQuantity;
+
+            if (quantityDifference > 0 && quantityDifference > product.getStock()) {
+                throw new StockShortageException(product.getName(), product.getStock());
+            } else {
+                // 更新產品的庫存量
+                product.setStock(product.getStock() - quantityDifference);
+                productRepository.save(product);
+            }
+
+            orderItem.setOrder(order);
+            orderItem.setProduct(product);
+            orderItem.setQuantity(newQuantity);
             orderItem.setPrice(itemDto.getPrice());
-            orderItem.setProduct(productRepository.findById(itemDto.getProductId())
-                    .orElseThrow(() -> new IllegalStateException("產品ID " + itemDto.getProductId() + " 不存在。")));
 
-            // 對於新增的項目，確保將它們添加到訂單中
             if (orderItem.getId() == null) {
                 order.getOrderItems().add(orderItem);
             }
@@ -159,6 +202,10 @@ public class OrderService {
         orderDto.setOrderNumber(order.getOrderNumber());
         orderDto.setTotalPrice(order.getTotalPrice());
         orderDto.setStatus(order.getStatus().toString());
+
+        // 設置最後更新人
+        orderDto.setLastUpdateUser(order.getLastUpdateUserName()); // 使用 getLastUpdateUserName() 取得更新人名字
+
         List<OrderItemDto> itemDtos = order.getOrderItems().stream().map(item -> {
             OrderItemDto itemDto = new OrderItemDto();
             itemDto.setId(item.getId());
@@ -168,7 +215,9 @@ public class OrderService {
             itemDto.setQuantity(item.getQuantity());
             return itemDto;
         }).collect(Collectors.toList());
+
         orderDto.setOrderItems(itemDtos);
+
         return orderDto;
     }
 
