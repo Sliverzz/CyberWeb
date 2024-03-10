@@ -50,9 +50,7 @@
                     <div class="mb-3">
                         <label for="editOrderStatus" class="form-label">Status</label>
                         <select class="form-select" id="editOrderStatus" name="status" required>
-                            <option value="PROCESSING">Processing</option>
-                            <option value="SHIPPED">Shipped</option>
-                            <option value="DELIVERED">Delivered</option>
+                            <!-- 動態填充 -->
                         </select>
                     </div>
                     <!-- orderItem顯示區域 -->
@@ -260,6 +258,17 @@
                         });
                     }
                 }
+            });
+        });
+    });
+
+    $(document).ready(function() {
+        // 獲取訂單狀態並動態填充
+        $.get("/order/orderStatus", function(statuses) {
+            var $select = $('#editOrderStatus');
+            statuses.forEach(function(status) {
+                var $option = $('<option>').val(status).text(status);
+                $select.append($option);
             });
         });
     });

@@ -111,7 +111,7 @@
         </div>
         <div class="col-md-8">
             <!-- 個人資料表單 -->
-            <form role="form" id="profileForm" th:action="@{/user/profile}" th:method="post">
+            <form role="form" id="profileForm" th:action="@{/user/updateProfile}" th:method="post">
                 <!-- 用戶id -->
                 <input type="hidden" name="userHashId" th:value="${userHashId}">
                 <div class="p-3 py-5">

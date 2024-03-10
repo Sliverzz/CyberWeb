@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,12 +30,16 @@ public class ProductController {
         this.productService = productService;
     }
 
+    // 查所有產品
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     @GetMapping("/listAll")
     public ResponseEntity<List<Product>> listAllProducts() {
         List<Product> products = productService.findAll();
         return ResponseEntity.ok(products);
     }
 
+    // 新增產品
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/create")
     public String createProduct(@ModelAttribute Product product, @RequestParam(value = "productImage") MultipartFile file,
                                 HttpServletRequest request, RedirectAttributes redirectAttributes) {
@@ -55,12 +60,15 @@ public class ProductController {
         return WebUtils.redirectBack(request, WebUtils.DEFAULT_REDIRECT);
     }
 
+    // 商品資訊
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     @GetMapping("/productInfo")
     @ResponseBody
     public Product productInfo(@RequestParam("id") Long id) {
         return productService.findProductById(id);
     }
 
+    // 商品頁迭代產品
     @GetMapping("/fetchProducts")
     public ResponseEntity<Page<Product>> listProducts(@RequestParam(value = "page", defaultValue = "0") int page,
                                                       @RequestParam(value = "size", defaultValue = "10") int size) {
@@ -68,6 +76,8 @@ public class ProductController {
         return ResponseEntity.ok(products);
     }
 
+    // 更新
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/update")
     public String updateProduct(@ModelAttribute Product product , @RequestParam(value = "productImage") MultipartFile file,
                                 HttpServletRequest request, RedirectAttributes redirectAttributes) {
@@ -81,6 +91,8 @@ public class ProductController {
         return WebUtils.redirectBack(request, WebUtils.DEFAULT_REDIRECT);
     }
 
+    // 刪除
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/delete")
     public String deleteProduct(@RequestParam("id") Long id,HttpServletRequest request,RedirectAttributes redirectAttributes) {
         try {

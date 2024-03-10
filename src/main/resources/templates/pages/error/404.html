@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 Not Found</title>
+    <style>
+        body, html {
+            height: 100%;
+            margin: 0;
+            font-family: 'Courier New', Courier, monospace;
+            background-color: #121212;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .container {
+            max-width: 600px;
+            padding: 20px;
+        }
+
+        .error-code {
+            font-size: 100px;
+            font-weight: bold;
+            color: #ff0099;
+        }
+
+        .error-message {
+            font-size: 24px;
+            color: #0af;
+        }
+
+        .error-description {
+            margin-top: 20px;
+            color: #aaa;
+        }
+
+        .return-home {
+            margin-top: 40px;
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #ff0099;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        .return-home:hover {
+            background-color: #0af;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="error-code">404</div>
+    <div class="error-message">Page Not Found</div>
+    <div class="error-description">The page you are looking for might have been removed, had its name changed, or is temporarily unavailable.</div>
+    <a href="/site/index" class="return-home">Return Home</a>
+</div>
+</body>
+</html>

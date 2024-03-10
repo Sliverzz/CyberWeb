@@ -7,7 +7,107 @@
 </head>
 <body>
 <div th:replace="~{layouts/sHeader :: body}"></div>
+<!-- Datatables產品表格 -->
+<div class="container rounded bg-white mt-5 mb-5">
+    <table id="orderTable" class="display" style="width:100%">
+        <thead>
+        <tr>
+            <th>Order Number</th>
+            <th>Total Price</th>
+            <th>Status</th>
+            <th>Date Created</th>
+            <th>Last Updated</th>
+            <th>Last Update User</th>
+            <th>Option</th>
+        </tr>
+        </thead>
+        <tbody>
+        <!-- 數據由 DataTables 動態載入 -->
+        </tbody>
+    </table>
+</div>
 
 <div th:replace="~{layouts/sFooter :: body}"></div>
+
+<!-- datatable -->
+<script src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
+<script>
+    // Datatable
+    $(document).ready(function() {
+        $('#orderTable').DataTable({
+            "processing": true,
+            "serverSide": false,
+            "ajax": {
+                "url": "/order/listUserOrders",
+                "type": "GET",
+                "dataSrc": ""
+            },
+            "columns": [
+                { "data": "orderNumber" }, // 訂單編號
+                { "data": "totalPrice" }, // 訂單總價
+                { "data": "status" }, // 訂單狀態
+                { "data": "dateCreated" }, // 創建時間
+                { "data": "lastUpdated" }, // 最後更新時間
+                {
+                    "data": "lastUpdateUser", // 最後更新人
+                    "render": function(data, type, row) {
+                        if (data) {
+                            // 有值時
+                            return '<span style="color: #66afe9; text-decoration: underline;">' + data + '</span>';
+                        } else {
+                            // null時
+                            return '<span style="color: gray;">Not updated yet</span>';
+                        }
+                    }
+                },
+                {
+                    "data": "status",
+                    "render": function(data, type, row) {
+                        // 根據訂單狀態動態生成按鈕
+                        if (row.status === "PAID") {
+                            return '<button class="btn btn-warning profile-button btn-block" style="margin-top: 15px; width: 100px;" onclick="refundOrder(' + row.id + ')">Refund</button>';
+                        } else if (row.status === "UNPAID") {
+                            return '<button class="btn btn-success profile-button btn-block" style="margin-top: 15px; width: 100px;" onclick="payOrder(' + row.id + ')">Pay</button>';
+                        } else {
+                            // 條件外顯示的訊息
+                            return '';
+                        }
+                    },
+                    "orderable": false, // 禁用排序
+                }
+            ],
+            "language": {
+                "paginate": {
+                    "previous": "<i class='fa fa-arrow-left'></i>",
+                    "next": "<i class='fa fa-arrow-right'></i>"
+                }
+            }
+        });
+    });
+
+    // 退款
+    function refundOrder(id) {
+        // 實現退款邏輯
+        console.log("Refunding order with ID:", id);
+    }
+
+    // 付款
+    function payOrder(id) {
+        // 實現付款邏輯
+        console.log("Paying for order with ID:", id);
+    }
+
+    // 產品圖片顯示 - 暫時用不到
+    // document.getElementById('productImage').onchange = function(event) {
+    //     var reader = new FileReader();
+    //     reader.onload = function() {
+    //         var output = document.getElementById('imagePreview');
+    //         output.src = reader.result;
+    //         output.style.display = 'block'; // 顯示圖片預覽
+    //     };
+    //     reader.readAsDataURL(event.target.files[0]);
+    // };
+
+</script>
 </body>
 </html>

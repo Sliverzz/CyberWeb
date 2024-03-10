@@ -4,6 +4,7 @@ import com.sean.cyberweb.domain.User;
 import com.sean.cyberweb.services.ProductService;
 import com.sean.cyberweb.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -39,6 +40,7 @@ public class SiteController {
     }
 
     // 購物車
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     @GetMapping("/cart")
     public String cart(Model model) {
         User currentUser = userService.getCurrentUser();
@@ -52,6 +54,7 @@ public class SiteController {
     }
 
     // 會員個人資料管理
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     @GetMapping("/profile")
     public String profile(Model model) {
         User currentUser = userService.getCurrentUser();
@@ -74,7 +77,8 @@ public class SiteController {
         return "/pages/site/profile";
     }
 
-    // 訂單管理
+    // 個人訂單管理
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     @GetMapping("/order")
     public String order(Model model){
         User currentUser = userService.getCurrentUser();

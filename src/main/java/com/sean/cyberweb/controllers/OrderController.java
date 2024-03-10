@@ -7,13 +7,16 @@ import com.sean.cyberweb.services.OrderService;
 import com.sean.cyberweb.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/order")
@@ -28,12 +31,28 @@ public class OrderController {
         this.userService = userService;
     }
 
+    // 後臺使用 - 查詢所有訂單
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/listAll")
     public ResponseEntity<List<OrderDto>> listAllOrders(Pageable pageable) {
         List<OrderDto> orders = orderService.findAll(pageable).getContent();
         return ResponseEntity.ok(orders);
     }
 
+    // 前台會員中心 - 使用者查詢個人訂單
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
+    @GetMapping("/listUserOrders")
+    public ResponseEntity<List<OrderDto>> listUserOrders(Pageable pageable) {
+        try {
+            Page<OrderDto> orders = orderService.findAllByUserId(pageable);
+            return ResponseEntity.ok(orders.getContent());
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
+    }
+
+    // 獲取個別訂單資訊
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     @GetMapping("/getOrderInfo")
     public ResponseEntity<OrderDto> getOrderInfo(@RequestParam Long id) {
         Order order = orderService.findById(id);
@@ -41,6 +60,18 @@ public class OrderController {
         return ResponseEntity.ok(orderDto);
     }
 
+    // 訂單狀態
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
+    @GetMapping("/orderStatus")
+    public ResponseEntity<List<String>> getOrderStatuses() {
+        List<String> statuses = Arrays.stream(Order.OrderStatus.values())
+                .map(Enum::name)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(statuses);
+    }
+
+    // 更新
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     @PostMapping("/update")
     public ResponseEntity<?> updateOrder(@RequestBody OrderDto orderDto) {
         User currentUser = userService.getCurrentUser();

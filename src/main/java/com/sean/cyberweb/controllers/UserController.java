@@ -5,6 +5,7 @@ import com.sean.cyberweb.services.UserService;
 import com.sean.cyberweb.utils.WebUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -70,7 +71,8 @@ public class UserController {
     }
 
     // 更新用使用者資料
-    @PostMapping("/profile")
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
+    @PostMapping("/updateProfile")
     public String updateUserProfile(@RequestParam(value = "userHashId", required = false) String userHashId, User user,
                                     HttpServletRequest request,RedirectAttributes redirectAttributes) {
         try {

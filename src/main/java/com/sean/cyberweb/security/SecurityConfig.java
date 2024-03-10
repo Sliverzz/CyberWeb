@@ -43,10 +43,7 @@ public class SecurityConfig {
                         .sessionRegistry(sessionRegistry()) // 使用自定義的sessionRegistry
                 )
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/user/login", "/user/signUp", "/site/index").permitAll() // 允許所有訪問登入、註冊、前台首頁
-                        .requestMatchers("/dashboard/**").hasRole("ADMIN") // "/dashboard/**"限制只有ADMIN
-                        .requestMatchers("/site/**").hasAnyRole("ADMIN", "USER") // "/site/**"對ADMIN和USER開放
-                        .anyRequest().permitAll() // 其他所有請求允許訪問
+                        .anyRequest().permitAll() // (重要)統一在controller端控管權限
                 )
                 .exceptionHandling(exception -> exception
                         .accessDeniedHandler(customAccessDeniedHandler())

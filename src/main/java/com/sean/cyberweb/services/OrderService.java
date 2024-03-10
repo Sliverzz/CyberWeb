@@ -52,7 +52,7 @@ public class OrderService {
 
         Order newOrder = new Order();
         newOrder.setUserId(userId);
-        newOrder.setStatus(Order.OrderStatus.PROCESSING);
+        newOrder.setStatus(Order.OrderStatus.UNPAID);
         newOrder.setOrderItems(new HashSet<>());
 
         // 生成唯一訂單編號
@@ -117,7 +117,29 @@ public class OrderService {
         return dtoPage;
     }
 
-    // id查訂單
+    public Page<OrderDto> findAllByUserId(Pageable pageable) {
+        User currentUser = userService.getCurrentUser();
+        if (currentUser == null) {
+            throw new RuntimeException("User not authenticated"); // Handle this exception appropriately.
+        }
+
+        Page<Order> orderPage = orderRepository.findAllByUserId(currentUser.getId(), pageable);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+        return orderPage.map(order -> {
+            OrderDto dto = new OrderDto();
+            dto.setId(order.getId());
+            dto.setOrderNumber(order.getOrderNumber());
+            dto.setStatus(order.getStatus().toString());
+            dto.setTotalPrice(order.getTotalPrice());
+            dto.setDateCreated(order.getDateCreated().format(formatter));
+            dto.setLastUpdated(order.getLastUpdated().format(formatter));
+            dto.setLastUpdateUser(order.getLastUpdateUserName());
+            return dto;
+        });
+    }
+
+    // id查找個別訂單
     public Order findById(Long id) {
         // 使用Optional防止null值
         Optional<Order> orderOptional = orderRepository.findById(id);

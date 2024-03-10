@@ -4,6 +4,7 @@ import com.sean.cyberweb.services.UserService;
 import com.sean.cyberweb.utils.WebUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -20,6 +21,7 @@ public class ImgController {
         this.userService = userService;
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     @PostMapping("/upload")
     public String uploadImage(@RequestParam("userHashId") String userHashId, @RequestParam("file") MultipartFile file,
                               HttpServletRequest request, RedirectAttributes redirectAttributes) {
