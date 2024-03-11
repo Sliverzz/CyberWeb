@@ -27,6 +27,47 @@
     </table>
 </div>
 
+<!-- 訂單信息 -->
+<div class="modal fade" id="viewOrderModal" tabindex="-1" aria-labelledby="viewOrderModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="viewOrderModalLabel">Order Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="viewOrderForm">
+                    <input type="hidden" id="viewOrderId" name="id">
+                    <div class="mb-3">
+                        <label for="viewOrderNumber" class="form-label">Order Number</label>
+                        <input type="text" class="form-control" id="viewOrderNumber" name="orderNumber" disabled readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label for="viewOrderTotalPrice" class="form-label">Total Price</label>
+                        <input type="number" class="form-control" id="viewOrderTotalPrice" name="totalPrice" disabled readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label for="viewOrderStatus" class="form-label">Status</label>
+                        <select class="form-select" id="viewOrderStatus" name="status" required disabled>
+                            <!-- 動態填充 -->
+                        </select>
+                    </div>
+                    <!-- 訂單項目顯示區域 -->
+                    <div class="mb-3">
+                        <label class="form-label">Order Items</label>
+                        <div id="viewOrderItemsContainer" class="container">
+                            <!-- 訂單項目動態填充於此 -->
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-dark" data-bs-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div th:replace="~{layouts/sFooter :: body}"></div>
 
 <!-- datatable -->
@@ -43,7 +84,13 @@
                 "dataSrc": ""
             },
             "columns": [
-                { "data": "orderNumber" }, // 訂單編號
+                {
+                    "data": "orderNumber", // 訂單編號
+                    "render": function(data, type, row) {
+                        // 直接使用訂單編號開啟modal
+                        return '<a href="#" style="color: #007bff; text-decoration: underline;" onmouseover="this.style.color=\'#d9534f\';" onmouseout="this.style.color=\'#007bff\'; this.style.textDecoration=\'underline\';" onclick="getOrderInfo(' + row.id + '); return false;">' + data + '</a>';
+                    }
+                },
                 { "data": "totalPrice" }, // 訂單總價
                 { "data": "status" }, // 訂單狀態
                 { "data": "dateCreated" }, // 創建時間
@@ -61,19 +108,18 @@
                     }
                 },
                 {
-                    "data": "status",
+                    "data": "id",
                     "render": function(data, type, row) {
                         // 根據訂單狀態動態生成按鈕
+                        let buttonHTML = '';
                         if (row.status === "PAID") {
-                            return '<button class="btn btn-warning profile-button btn-block" style="margin-top: 15px; width: 100px;" onclick="refundOrder(' + row.id + ')">Refund</button>';
+                            buttonHTML += '<button class="btn btn-warning" style="margin-top: 15px; width: 100px;" onclick="refundOrder(' + data + ')">Refund</button>';
                         } else if (row.status === "UNPAID") {
-                            return '<button class="btn btn-success profile-button btn-block" style="margin-top: 15px; width: 100px;" onclick="payOrder(' + row.id + ')">Pay</button>';
-                        } else {
-                            // 條件外顯示的訊息
-                            return '';
+                            buttonHTML += '<button class="btn btn-success" style="margin-top: 15px; width: 100px;" onclick="payOrder(' + data + ')">Pay</button>';
                         }
+                        return buttonHTML;
                     },
-                    "orderable": false, // 禁用排序
+                    "orderable": false // 禁用排序
                 }
             ],
             "language": {
@@ -84,6 +130,56 @@
             }
         });
     });
+
+    function getOrderInfo(orderId) {
+        $.get("/order/getOrderInfo", { id: orderId })
+            .done(function(data) {
+                // 獲取訂單詳情
+                var orderDetails = data.order;
+
+                // 填充基本訂單內容
+                $('#viewOrderId').val(orderDetails.id);
+                $('#viewOrderNumber').val(orderDetails.orderNumber);
+                $('#viewOrderTotalPrice').val(orderDetails.totalPrice);
+
+                // 清空舊的orderItems資訊
+                $('#viewOrderItemsContainer').empty();
+
+                // 為每個orderItem生成html並加到容器中
+                orderDetails.orderItems.forEach(function(item) {
+                    var orderItemHTML = `
+                <div class="row mb-2 order-item" data-item-id="${item.id}">
+                    <div class="col">
+                        <input type="hidden" name="productId" value="${item.productId}">
+                        <label class="form-label">Name</label>
+                        <input type="text" name="productName" class="form-control" value="${item.productName}" title="${item.productName}" disabled readonly>
+                    </div>
+                    <div class="col">
+                        <label class="form-label">Quantity</label>
+                        <input type="number" class="form-control" name="quantity" value="${item.quantity}" disabled readonly>
+                    </div>
+                    <div class="col">
+                        <label class="form-label">Price</label>
+                        <input type="text" name="price" class="form-control" value="${item.price}" disabled readonly>
+                    </div>
+                </div>
+                `;
+                    $('#viewOrderItemsContainer').append(orderItemHTML);
+                });
+
+                // 清空並填充訂單狀態下拉列表
+                var $select = $('#viewOrderStatus').empty();
+                data.statuses.forEach(function(status) {
+                    var $option = $('<option>').val(status).text(status);
+                    $select.append($option);
+                });
+                // 設置當前訂單狀態
+                $select.val(orderDetails.status);
+
+                // 顯示Modal
+                $('#viewOrderModal').modal('show');
+            });
+    }
 
     // 退款
     function refundOrder(id) {

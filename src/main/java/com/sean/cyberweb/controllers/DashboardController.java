@@ -45,7 +45,7 @@ public class DashboardController {
         String userHashId = userService.encode(currentUser.getId());
 
         // 預設頭像的Web路徑
-        String avatarUrl = "/assets/img/profile-img.png";
+        String avatarUrl = currentUser.getAvatarUrl();
         // 檢查用戶是否有設定頭像
         if (currentUser.hasAvatar() && currentUser.getProfileImagePath() != null) {
             // 直接使用用戶設定的頭像路徑

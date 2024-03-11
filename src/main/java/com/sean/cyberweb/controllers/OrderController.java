@@ -15,7 +15,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Controller
@@ -54,24 +56,24 @@ public class OrderController {
     // 獲取個別訂單資訊
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     @GetMapping("/getOrderInfo")
-    public ResponseEntity<OrderDto> getOrderInfo(@RequestParam Long id) {
+    public ResponseEntity<Map<String, Object>> getOrderInfo(@RequestParam Long id) {
         Order order = orderService.findById(id);
         OrderDto orderDto = orderService.convertToOrderDto(order);
-        return ResponseEntity.ok(orderDto);
-    }
 
-    // 訂單狀態
-    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
-    @GetMapping("/orderStatus")
-    public ResponseEntity<List<String>> getOrderStatuses() {
+        // 訂單狀態
         List<String> statuses = Arrays.stream(Order.OrderStatus.values())
                 .map(Enum::name)
                 .collect(Collectors.toList());
-        return ResponseEntity.ok(statuses);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("order", orderDto);
+        response.put("statuses", statuses);
+
+        return ResponseEntity.ok(response);
     }
 
     // 更新
-    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/update")
     public ResponseEntity<?> updateOrder(@RequestBody OrderDto orderDto) {
         User currentUser = userService.getCurrentUser();

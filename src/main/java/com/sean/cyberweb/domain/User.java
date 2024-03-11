@@ -61,7 +61,7 @@ public class User {
         if (hasAvatar()) {
             return profileImagePath;
         } else {
-            return "/assets/img/profile-img.png";
+            return "/img/profile-img.png";
         }
     }
 

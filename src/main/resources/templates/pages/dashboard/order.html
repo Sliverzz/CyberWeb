@@ -61,7 +61,7 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-primary" data-bs-dismiss="modal" style="background-color: #1968ff">Cancel</button>
+                        <button type="button" class="btn btn-dark" data-bs-dismiss="modal">Cancel</button>
                         <button type="submit" class="btn btn-primary">Save Changes</button>
                     </div>
                 </form>
@@ -125,40 +125,51 @@
     function getOrderInfo(orderId) {
         $.get("/order/getOrderInfo", { id: orderId })
             .done(function(data) {
-                // 填充基本訂單信息
-                $('#editOrderId').val(data.id);
-                $('#editOrderNumber').val(data.orderNumber);
-                $('#editOrderTotalPrice').val(data.totalPrice);
-                $('#editOrderStatus').val(data.status);
+                // 獲取order詳情
+                var orderDetails = data.order;
 
-                // 清空舊的訂單項目資訊
+                // 填充基本訂單內容
+                $('#editOrderId').val(orderDetails.id);
+                $('#editOrderNumber').val(orderDetails.orderNumber);
+                $('#editOrderTotalPrice').val(orderDetails.totalPrice);
+
+                // 清空舊的orderItems資訊清空旧的订单项目信息
                 $('#editOrderItemsContainer').empty();
 
-                // 為每個訂單項目生成HTML，並加入到容器中
-                data.orderItems.forEach(function(item) {
+                // 為每個orderItem生成html並加到容器中
+                orderDetails.orderItems.forEach(function(item) {
                     var orderItemHTML = `
-                    <div class="row mb-2 order-item" data-item-id="${item.id}">
-                        <div class="col">
-                            <input type="hidden" name="productId" value="${item.productId}">
-                            <label class="form-label">Name</label>
-                            <input type="text" name="productName" class="form-control" value="${item.productName}" title="${item.productName}" disabled>
-                        </div>
-                        <div class="col">
-                            <label class="form-label">Quantity</label>
-                            <input type="number" class="form-control" name="quantity" value="${item.quantity}" min="1">
-                        </div>
-                        <div class="col">
-                            <label class="form-label">Price</label>
-                            <input type="text" name="price" class="form-control" value="${item.price}" disabled>
-                        </div>
-                        <div class="col">
-                            <label class="form-label">Remove</label>
-                            <button type="button" class="form-control btn btn-danger remove-item-btn">Remove</button>
-                        </div>
+                <div class="row mb-2 order-item" data-item-id="${item.id}">
+                    <div class="col">
+                        <input type="hidden" name="productId" value="${item.productId}">
+                        <label class="form-label">Name</label>
+                        <input type="text" name="productName" class="form-control" value="${item.productName}" title="${item.productName}" disabled>
                     </div>
-                    `;
+                    <div class="col">
+                        <label class="form-label">Quantity</label>
+                        <input type="number" class="form-control" name="quantity" value="${item.quantity}" min="1">
+                    </div>
+                    <div class="col">
+                        <label class="form-label">Price</label>
+                        <input type="text" name="price" class="form-control" value="${item.price}" disabled>
+                    </div>
+                    <div class="col">
+                        <label class="form-label">Remove</label>
+                        <button type="button" class="form-control btn btn-danger remove-item-btn">Remove</button>
+                    </div>
+                </div>
+                `;
                     $('#editOrderItemsContainer').append(orderItemHTML);
                 });
+
+                // 清空並填充訂單狀態下拉列表
+                var $select = $('#editOrderStatus').empty();
+                data.statuses.forEach(function(status) {
+                    var $option = $('<option>').val(status).text(status);
+                    $select.append($option);
+                });
+                // 設置當前訂單狀態
+                $select.val(orderDetails.status);
 
                 // 顯示Modal
                 $('#editOrderModal').modal('show');
@@ -258,17 +269,6 @@
                         });
                     }
                 }
-            });
-        });
-    });
-
-    $(document).ready(function() {
-        // 獲取訂單狀態並動態填充
-        $.get("/order/orderStatus", function(statuses) {
-            var $select = $('#editOrderStatus');
-            statuses.forEach(function(status) {
-                var $option = $('<option>').val(status).text(status);
-                $select.append($option);
             });
         });
     });

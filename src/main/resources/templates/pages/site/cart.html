@@ -117,7 +117,6 @@
                     <div class="payment-method-selection">
                         <label for="paymentMethod">Payment Method:</label>
                         <select id="paymentMethod" class="payment-method-select">
-                            <option value="" disabled>Select :</option>
                             <option value="linePay">LinePay</option>
                             <option value="paypal">PayPal</option>
                         </select>
@@ -241,7 +240,7 @@
         updateCartUI();
     }
 
-    // 按鈕監聽
+    // 增、減、刪除按鈕監聽
     function addEventListenersToButtons(userHashId) {
         // 確保在動態生成的元素上綁定事件
         document.querySelector('.cart-items').addEventListener('click', function(e) {
@@ -344,6 +343,7 @@
         }
     });
 
+    // 記憶金流選擇
     document.addEventListener('DOMContentLoaded', function() {
         // 嘗試從 DOM 中獲取用戶 hash ID，如果不存在則使用默認值
         const userHashId = document.getElementById('userHashId') ? document.getElementById('userHashId').textContent : 'defaultUser';
@@ -351,18 +351,16 @@
 
         // 檢查 localStorage 中是否有保存的支付方法針對特定用戶
         var savedPaymentMethod = localStorage.getItem(paymentMethodKey);
+        const paymentMethodSelect = document.getElementById('paymentMethod');
 
         if (savedPaymentMethod) {
             // 如果有保存的支付方法，則選擇該方法
-            document.getElementById('paymentMethod').value = savedPaymentMethod;
-        } else {
-            // 如果沒有保存的支付方法，則選擇預設的不可選擇選項
-            document.getElementById('paymentMethod').value = '';
+            paymentMethodSelect.value = savedPaymentMethod;
         }
 
         // 監聽選擇變更事件
-        document.getElementById('paymentMethod').addEventListener('change', function() {
-            // 保存選擇到 localStorage，針對特定用戶
+        paymentMethodSelect.addEventListener('change', function() {
+            // 保存用戶選擇至 localStorage
             localStorage.setItem(paymentMethodKey, this.value);
         });
     });
