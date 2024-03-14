@@ -328,7 +328,7 @@
                 Swal.fire({
                     icon: 'error',
                     title: 'Stock Shortage', // "庫存不足"
-                    html: errorData.message.replace(/\n/g, '<br>'), // 使用 HTML 属性并将换行符替换为 <br>
+                    html: errorData.message.replace(/\n/g, '<br>'), // 使用 HTML 將/n 換成 <br>
                     confirmButtonText: 'Close' // "關閉"
                 });
             } else {

@@ -37,6 +37,8 @@
             </div>
             <div class="modal-body">
                 <form id="viewOrderForm">
+                    <!-- 隱藏hashId -->
+                    <span id="userHashId" style="display:none" th:text="${userHashId}"></span>
                     <input type="hidden" id="viewOrderId" name="id">
                     <div class="mb-3">
                         <label for="viewOrderNumber" class="form-label">Order Number</label>
@@ -48,9 +50,8 @@
                     </div>
                     <div class="mb-3">
                         <label for="viewOrderStatus" class="form-label">Status</label>
-                        <select class="form-select" id="viewOrderStatus" name="status" required disabled>
+                        <input type="text" class="form-control" id="viewOrderStatus" name="status" required disabled>
                             <!-- 動態填充 -->
-                        </select>
                     </div>
                     <!-- 訂單項目顯示區域 -->
                     <div class="mb-3">
@@ -83,12 +84,23 @@
                 "type": "GET",
                 "dataSrc": ""
             },
+            "pageLength": 5, // 初始每頁顯示五筆資料
+            "pagingType": "simple_numbers", // 分頁類型
+            "lengthMenu": [ [5, 10, 15, -1], [5, 10, 15, "All"] ], // 自定義分頁
+            "scrollY": "400px", // 啟用垂直滾動
+            "scrollCollapse": true, // 允許表格高度縮減
+            "paging": true, // 分頁
             "columns": [
                 {
                     "data": "orderNumber", // 訂單編號
                     "render": function(data, type, row) {
                         // 直接使用訂單編號開啟modal
-                        return '<a href="#" style="color: #007bff; text-decoration: underline;" onmouseover="this.style.color=\'#d9534f\';" onmouseout="this.style.color=\'#007bff\'; this.style.textDecoration=\'underline\';" onclick="getOrderInfo(' + row.id + '); return false;">' + data + '</a>';
+                        return "<a href='#' style='color: #007bff; text-decoration: underline;' " +
+                            "onmouseover=\"this.style.color='#d9534f';\" " +
+                            "onmouseout=\"this.style.color='#007bff'; " +
+                            "this.style.textDecoration='underline';\" " +
+                            "onclick=\"getOrderInfo('" + row.id + "'); " +
+                            "return false;\">" + data + "</a>";
                     }
                 },
                 { "data": "totalPrice" }, // 訂單總價
@@ -113,9 +125,9 @@
                         // 根據訂單狀態動態生成按鈕
                         let buttonHTML = '';
                         if (row.status === "PAID") {
-                            buttonHTML += '<button class="btn btn-warning" style="margin-top: 15px; width: 100px;" onclick="refundOrder(' + data + ')">Refund</button>';
+                            buttonHTML += "<button class='btn btn-warning' style='margin-top: 15px; width: 100px;' onclick=\"refundOrder('" + data + "')\">Refund</button>";
                         } else if (row.status === "UNPAID") {
-                            buttonHTML += '<button class="btn btn-success" style="margin-top: 15px; width: 100px;" onclick="payOrder(' + data + ')">Pay</button>';
+                            buttonHTML += "<button class='btn btn-success' style='margin-top: 15px; width: 100px;' onclick=\"payOrder('" + data + "')\">Pay</button>";
                         }
                         return buttonHTML;
                     },
@@ -168,16 +180,61 @@
                 });
 
                 // 清空並填充訂單狀態下拉列表
-                var $select = $('#viewOrderStatus').empty();
+                var $input = $('#viewOrderStatus').empty();
                 data.statuses.forEach(function(status) {
                     var $option = $('<option>').val(status).text(status);
-                    $select.append($option);
+                    $input.append($option);
                 });
                 // 設置當前訂單狀態
-                $select.val(orderDetails.status);
+                $input.val(orderDetails.status);
 
                 // 顯示Modal
                 $('#viewOrderModal').modal('show');
+            });
+    }
+
+    // 付款
+    function payOrder(orderId) {
+        // 獲取userHashId
+        const userHashId = document.getElementById('userHashId') ? document.getElementById('userHashId').textContent : 'defaultUser';
+
+        fetch(`/order/details/${orderId}`)
+            .then(response => response.json())
+            .then(data => {
+                const checkoutRequest = {
+                    userHashId: userHashId,
+                    paymentMethod: "linePay",
+                    cartItems: data.orderItems.map(item => ({
+                        id: item.productId,
+                        name: item.productName,
+                        price: item.price,
+                        quantity: item.quantity,
+                    }))
+                };
+                console.log(checkoutRequest)
+
+                return fetch('/payment/checkout', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(checkoutRequest),
+                });
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data && data.paymentUrl) {
+                    window.location.href = data.paymentUrl; // 重定向到支付URL
+                } else {
+                    throw new Error('Failed to get the payment URL, please try again.');
+                }
+            })
+            .catch(error => {
+                console.error('Error during payment:', error);
+                alert('An error occurred during payment. Please try again.');
             });
     }
 
@@ -187,11 +244,6 @@
         console.log("Refunding order with ID:", id);
     }
 
-    // 付款
-    function payOrder(id) {
-        // 實現付款邏輯
-        console.log("Paying for order with ID:", id);
-    }
 
     // 產品圖片顯示 - 暫時用不到
     // document.getElementById('productImage').onchange = function(event) {

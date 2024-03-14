@@ -6,11 +6,12 @@ import lombok.Setter;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.UUID;
 
 @Setter
 @Getter
 public class OrderDto {
-    private Long id;
+    private UUID id;
     private String orderNumber;
     private BigDecimal totalPrice;
     private String status;

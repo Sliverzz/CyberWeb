@@ -85,6 +85,12 @@
                 "type": "GET",
                 "dataSrc": ""
             },
+            "pageLength": 5, // 初始每頁顯示五筆資料
+            "pagingType": "simple_numbers", // 分頁類型
+            "lengthMenu": [ [5, 10, 15, -1], [5, 10, 15, "All"] ], // 自定義分頁
+            "scrollY": "400px", // 啟用垂直滾動
+            "scrollCollapse": true, // 允許表格高度縮減
+            "paging": true, // 分頁
             "columns": [
                 { "data": "orderNumber" }, // 訂單編號
                 { "data": "totalPrice" }, // 訂單總價

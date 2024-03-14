@@ -14,10 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Controller
@@ -56,7 +53,7 @@ public class OrderController {
     // 獲取個別訂單資訊
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     @GetMapping("/getOrderInfo")
-    public ResponseEntity<Map<String, Object>> getOrderInfo(@RequestParam Long id) {
+    public ResponseEntity<Map<String, Object>> getOrderInfo(@RequestParam UUID id) {
         Order order = orderService.findById(id);
         OrderDto orderDto = orderService.convertToOrderDto(order);
 
@@ -84,5 +81,22 @@ public class OrderController {
         Order updatedOrder = orderService.updateOrder(orderDto, currentUser);
 
         return ResponseEntity.ok().build();
+    }
+
+    // 構建付款用dto以便啟動付款
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
+    @GetMapping("/details/{orderId}")
+    public ResponseEntity<?> orderDetails(@PathVariable UUID orderId) {
+        try {
+            OrderDto orderDto = orderService.getOrderDetails(orderId);
+
+            if (orderDto == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Order not found");
+            }
+
+            return ResponseEntity.ok(orderDto);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error fetching order details");
+        }
     }
 }

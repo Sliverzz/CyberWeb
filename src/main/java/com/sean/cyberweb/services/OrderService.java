@@ -19,10 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.format.DateTimeFormatter;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -140,13 +137,42 @@ public class OrderService {
     }
 
     // id查找個別訂單
-    public Order findById(Long id) {
+    public Order findById(UUID id) {
         // 使用Optional防止null值
         Optional<Order> orderOptional = orderRepository.findById(id);
         if (orderOptional.isEmpty()) {
             throw new IllegalStateException("Order with id " + id + " does not exist.");
         }
         return orderOptional.get();
+    }
+
+    // 訂單頁付款 - 獲取訂單資訊並裝進dto
+    public OrderDto getOrderDetails(UUID orderId) {
+        Order order = orderRepository.findById(orderId).orElse(null);
+        if (order == null) {
+            return null;
+        }
+
+        OrderDto orderDto = new OrderDto();
+        orderDto.setId(order.getId());
+        orderDto.setOrderNumber(order.getOrderNumber());
+        orderDto.setTotalPrice(order.getTotalPrice());
+        orderDto.setStatus(order.getStatus().name());
+        orderDto.setDateCreated(order.getDateCreated().toString()); // 格式化日期
+        orderDto.setLastUpdated(order.getLastUpdated().toString()); // 格式化日期
+        // 填充OrderItems
+        order.getOrderItems().forEach(item -> {
+            OrderItemDto orderItemDto = new OrderItemDto();
+            orderItemDto.setId(item.getId());
+            orderItemDto.setProductId(item.getProduct().getId());
+            orderItemDto.setProductName(item.getProduct().getName());
+            orderItemDto.setPrice(item.getPrice());
+            orderItemDto.setQuantity(item.getQuantity());
+            orderItemDto.setProductImagePath(item.getProduct().getProductImagePath());
+            orderDto.getOrderItems().add(orderItemDto);
+        });
+
+        return orderDto;
     }
 
     // 更新訂單
@@ -241,6 +267,15 @@ public class OrderService {
         orderDto.setOrderItems(itemDtos);
 
         return orderDto;
+    }
+
+    // 單獨更新訂單狀態
+    @Transactional
+    public void updateOrderStatus(UUID orderId, Order.OrderStatus newStatus) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new IllegalStateException("Order with ID " + orderId + " does not exist."));
+        order.setStatus(newStatus);
+        orderRepository.save(order);
     }
 
     // 產生唯一訂單編號
