@@ -35,7 +35,7 @@ public class Order {
     @Column(nullable = false)
     private OrderStatus status; // 訂單狀態
 
-    @Column(precision = 19, scale = 2, nullable = false)
+    @Column(precision = 19, nullable = false)
     private BigDecimal totalPrice; // 訂單總價
 
     @CreationTimestamp
@@ -68,12 +68,13 @@ public class Order {
     }
 
     public enum OrderStatus {
-        UNPAID,        // 未付款
-        PAID,          // 已付款
-        REFUNDED,      // 已退款
-        CANCELLED,     // 已取消
-        PROCESSING,    // 正在處理
-        SHIPPED,       // 已發貨
-        DELIVERED      // 已送達
+        UNPAID,          // 未付款
+        PAID,            // 已付款
+        REFUNDED,        // 已退款
+        CANCELLED,       // 已取消
+        PROCESSING,      // 正在處理
+        SHIPPED,         // 已發貨
+        DELIVERED,       // 已送達
+        CANCEL_REQUESTED // 申請取消訂單中
     }
 }

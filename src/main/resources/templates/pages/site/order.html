@@ -27,7 +27,7 @@
     </table>
 </div>
 
-<!-- 訂單信息 -->
+<!-- 訂單 -->
 <div class="modal fade" id="viewOrderModal" tabindex="-1" aria-labelledby="viewOrderModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -64,6 +64,28 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-dark" data-bs-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 選擇付款方式modal -->
+<div class="modal fade" id="paymentModal" tabindex="-1" role="dialog" aria-labelledby="paymentModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="paymentModalLabel">Choose Payment</h5>
+            </div>
+            <div class="modal-body">
+                <!-- 選項 -->
+                <select id='paymentMethodModal' class='form-select'>
+                    <option value='linePay'>LinePay</option>
+                    <option value='payPal'>PayPal</option>
+                </select>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-dark" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="confirmPayment">CheckOut</button>
             </div>
         </div>
     </div>
@@ -122,16 +144,18 @@
                 {
                     "data": "id",
                     "render": function(data, type, row) {
-                        // 根據訂單狀態動態生成按鈕
                         let buttonHTML = '';
                         if (row.status === "PAID") {
-                            buttonHTML += "<button class='btn btn-warning' style='margin-top: 15px; width: 100px;' onclick=\"refundOrder('" + data + "')\">Refund</button>";
+                            buttonHTML += "<button class='btn btn-warning' style='margin-top: 15px; width: 100px;' onclick=\"linePayRefund('" + data + "')\">Refund</button>";
                         } else if (row.status === "UNPAID") {
-                            buttonHTML += "<button class='btn btn-success' style='margin-top: 15px; width: 100px;' onclick=\"payOrder('" + data + "')\">Pay</button>";
+                            // 打開modal選擇付款方式 & 取消訂單
+                            buttonHTML += '<button class="btn btn-success profile-button" style="margin-top: 15px; width: 100px;" onclick="openPaymentModal(\'' + data + '\')">Pay</button>' +
+                                ' <button class="btn btn-warning profile-button" style="margin-top: 15px; width: 100px;" onclick="cancelOrder(\'' + data + '\')">Cancel</button>';
+
                         }
                         return buttonHTML;
                     },
-                    "orderable": false // 禁用排序
+                    "orderable": false
                 }
             ],
             "language": {
@@ -193,8 +217,28 @@
             });
     }
 
-    // 付款
-    function payOrder(orderId) {
+    // 打開付款modal
+    function openPaymentModal(orderId) {
+        // 保存當前orderId付款時使用
+        $('#paymentModal').data('orderId', orderId);
+        $('#paymentModal').modal('show');
+    }
+
+    // 綁定modal的付款按鈕點擊
+    $('#confirmPayment').click(function() {
+        const orderId = $('#paymentModal').data('orderId');
+        const paymentMethod = $('#paymentMethodModal').val();
+        if (paymentMethod === 'linePay') {
+            linePay(orderId);
+        } else if (paymentMethod === 'payPal') {
+            // TODO:PayPal付款
+        }
+        // 關閉modal
+        $('#paymentModal').modal('hide');
+    });
+
+    // LinePay付款
+    function linePay(orderId) {
         // 獲取userHashId
         const userHashId = document.getElementById('userHashId') ? document.getElementById('userHashId').textContent : 'defaultUser';
 
@@ -202,16 +246,17 @@
             .then(response => response.json())
             .then(data => {
                 const checkoutRequest = {
+                    orderId: data.id,
                     userHashId: userHashId,
                     paymentMethod: "linePay",
                     cartItems: data.orderItems.map(item => ({
                         id: item.productId,
                         name: item.productName,
                         price: item.price,
+                        productImagePath: item.productImagePath,
                         quantity: item.quantity,
                     }))
                 };
-                console.log(checkoutRequest)
 
                 return fetch('/payment/checkout', {
                     method: 'POST',
@@ -238,8 +283,55 @@
             });
     }
 
-    // 退款
-    function refundOrder(id) {
+    // 申請取消訂單
+    function cancelOrder(orderId) {
+        // SweetAlert
+        swal.fire({
+            title: "Are you sure?",
+            text: "Do you really want to cancel this order?",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            cancelButtonText: 'No',
+            confirmButtonText: 'Yes',
+        })
+            .then((result) => {
+                if (result.isConfirmed) { // 用戶確認取消訂單
+                    // 呼叫取消Controller
+                    fetch(`/order/cancel/${orderId}`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' }
+                    })
+                        .then(response => {
+                            if (response.ok) {
+                                // 成功
+                                swal.fire({
+                                    title: "Cancelled!",
+                                    text: "Order cancellation requested successfully.",
+                                    icon: "success",
+                                }).then(() => {
+                                    // 對話框關閉後重導
+                                    window.location.reload();
+                                });
+                            }
+                        })
+                        .catch(error => {
+                            // 其他錯誤
+                            console.error('Error:', error);
+                            swal.fire("Error", "An error occurred.", "error");
+                        });
+                }
+            });
+    }
+
+    // PayPal付款
+    function payPal(orderId) {
+
+    }
+
+    // linePay退款
+    function linePayRefund(id) {
         // 實現退款邏輯
         console.log("Refunding order with ID:", id);
     }

@@ -9,6 +9,7 @@ import java.util.UUID;
 @Setter
 @Getter
 public class CheckoutRequestDto {
+    private UUID orderId;
     private String paymentMethod;
     private String userHashId;
     private List<CartItemDto> cartItems;

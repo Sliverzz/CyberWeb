@@ -29,7 +29,7 @@ public class Product {
     @Column(nullable = false, length = 500)
     private String description; // 產品描述
 
-    @Column(nullable = false, precision = 10, scale = 2)
+    @Column(nullable = false, precision = 10)
     private BigDecimal price; // 價格
 
     @Column(nullable = false)

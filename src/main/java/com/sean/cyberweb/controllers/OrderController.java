@@ -83,6 +83,34 @@ public class OrderController {
         return ResponseEntity.ok().build();
     }
 
+    // 前台申請取消訂單 & 後台確認取消訂單
+    @PostMapping("/cancel/{orderId}")
+    public ResponseEntity<?> cancelOrder(@PathVariable UUID orderId) {
+        try {
+            // 查詢當前訂單狀態
+            Order order = orderService.findById(orderId);
+            Order.OrderStatus currentStatus = order.getStatus();
+
+            // 根據當前訂單狀態更新
+            if (currentStatus == Order.OrderStatus.UNPAID) {
+                orderService.updateOrderStatus(orderId, Order.OrderStatus.CANCEL_REQUESTED);
+                return ResponseEntity.ok().body("Order cancellation requested successfully.");
+
+            } else if (currentStatus == Order.OrderStatus.CANCEL_REQUESTED) {
+                orderService.updateOrderStatus(orderId, Order.OrderStatus.CANCELLED);
+                return ResponseEntity.ok().body("Order has been cancelled successfully.");
+
+            } else {
+                // 如果為其他狀態就不給更改
+                return ResponseEntity.badRequest().body("Order cannot be cancelled in its current state.");
+            }
+        } catch (IllegalStateException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("An error occurred while processing the order cancellation.");
+        }
+    }
+
     // 構建付款用dto以便啟動付款
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     @GetMapping("/details/{orderId}")

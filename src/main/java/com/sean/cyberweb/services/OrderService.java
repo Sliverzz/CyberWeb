@@ -241,6 +241,15 @@ public class OrderService {
         return orderRepository.save(order);
     }
 
+    // 單獨更新訂單狀態
+    @Transactional
+    public void updateOrderStatus(UUID orderId, Order.OrderStatus newStatus) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new IllegalStateException("Order with ID " + orderId + " does not exist."));
+        order.setStatus(newStatus);
+        orderRepository.save(order);
+    }
+
     /**
      * 將訂單實體轉換為訂單數據傳輸對象 (DTO)，用於前後端數據交互。
      */
@@ -267,15 +276,6 @@ public class OrderService {
         orderDto.setOrderItems(itemDtos);
 
         return orderDto;
-    }
-
-    // 單獨更新訂單狀態
-    @Transactional
-    public void updateOrderStatus(UUID orderId, Order.OrderStatus newStatus) {
-        Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new IllegalStateException("Order with ID " + orderId + " does not exist."));
-        order.setStatus(newStatus);
-        orderRepository.save(order);
     }
 
     // 產生唯一訂單編號

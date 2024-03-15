@@ -10,7 +10,6 @@ import com.sean.cyberweb.services.PaymentServiceFactory;
 import com.sean.cyberweb.dto.CheckoutRequestDto;
 import com.sean.cyberweb.utils.WebUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -18,7 +17,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -46,9 +44,21 @@ public class PaymentController {
             // 1. 從請求中提取支付方法和購物車項目
             String paymentMethod = checkoutRequestDTO.getPaymentMethod();
             List<CartItemDto> cartItems = checkoutRequestDTO.getCartItems();
+            UUID orderId = checkoutRequestDTO.getOrderId();
+            String userHashId = checkoutRequestDTO.getUserHashId();
 
             // 2. 創建訂單
-            Order order = orderService.createOrder(cartItems, checkoutRequestDTO.getUserHashId());
+            Order order;
+            if (orderId != null && !orderId.toString().isEmpty()) {
+                // 使用現有訂單
+                order = orderService.findById(orderId);
+                if (order == null) {
+                    throw new IllegalArgumentException("Order not found.");
+                }
+            } else {
+                // 創建新訂單
+                order = orderService.createOrder(cartItems, userHashId);
+            }
 
             // 3. 根據支付方法，獲取對應的支付服務
             PaymentService paymentService = paymentServiceFactory.getPaymentService(paymentMethod);

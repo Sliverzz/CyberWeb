@@ -31,6 +31,6 @@ public class OrderItem {
     @Column(nullable = false)
     private Integer quantity; // 購買數量
 
-    @Column(nullable = false)
+    @Column(precision = 19, nullable = false)
     private BigDecimal price; // 購買時的價格
 }
