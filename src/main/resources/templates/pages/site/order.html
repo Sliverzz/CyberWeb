@@ -325,17 +325,52 @@
             });
     }
 
+    // 申請linePay退款
+    function linePayRefund(orderId) {
+        // SweetAlert
+        swal.fire({
+            title: "Are you sure?",
+            text: "Are you sure you want to apply for a refund?",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            cancelButtonText: 'No',
+            confirmButtonText: 'Yes',
+        })
+            .then((result) => {
+                if (result.isConfirmed) { // 用戶確認取消訂單
+                    // 呼叫取消Controller
+                    fetch(`/order/linePayRefund/${orderId}`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' }
+                    })
+                        .then(response => {
+                            if (response.ok) {
+                                // 成功
+                                swal.fire({
+                                    title: "Refunded!",
+                                    text: "Refund request submitted successfully.",
+                                    icon: "success",
+                                }).then(() => {
+                                    // 對話框關閉後重導
+                                    window.location.reload();
+                                });
+                            }
+                        })
+                        .catch(error => {
+                            // 其他錯誤
+                            console.error('Error:', error);
+                            swal.fire("Error", "An error occurred.", "error");
+                        });
+                }
+            });
+    }
+
     // PayPal付款
     function payPal(orderId) {
 
     }
-
-    // linePay退款
-    function linePayRefund(id) {
-        // 實現退款邏輯
-        console.log("Refunding order with ID:", id);
-    }
-
 
     // 產品圖片顯示 - 暫時用不到
     // document.getElementById('productImage').onchange = function(event) {

@@ -3,6 +3,7 @@ package com.sean.cyberweb.controllers;
 import com.sean.cyberweb.domain.Order;
 import com.sean.cyberweb.domain.User;
 import com.sean.cyberweb.dto.OrderDto;
+import com.sean.cyberweb.services.LinePayService;
 import com.sean.cyberweb.services.OrderService;
 import com.sean.cyberweb.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,11 +24,13 @@ public class OrderController {
 
     private final OrderService orderService;
     private final UserService userService;
+    private final LinePayService linePayService;
 
     @Autowired
-    public OrderController(OrderService orderService, UserService userService){
+    public OrderController(OrderService orderService, UserService userService, LinePayService linePayService){
         this.orderService = orderService;
         this.userService = userService;
+        this.linePayService = linePayService;
     }
 
     // 後臺使用 - 查詢所有訂單
@@ -108,6 +111,34 @@ public class OrderController {
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body("An error occurred while processing the order cancellation.");
+        }
+    }
+
+    // 前台申請訂單退款 & 後台確認將訂單退款(linePay)
+    @PostMapping("/linePayRefund/{orderId}")
+    public ResponseEntity<?> linePayRefund(@PathVariable UUID orderId) {
+        try {
+            // 查詢當前訂單狀態
+            Order order = orderService.findById(orderId);
+            Order.OrderStatus currentStatus = order.getStatus();
+
+            // 根據當前訂單狀態更新
+            if (currentStatus == Order.OrderStatus.PAID) {
+                orderService.updateOrderStatus(orderId, Order.OrderStatus.REFUND_REQUESTED);
+                return ResponseEntity.ok().body("Refund request submitted successfully.");
+
+            } else if (currentStatus == Order.OrderStatus.REFUND_REQUESTED) {
+                linePayService.refundPayment(order.getTransactionId(), orderId, order.getTotalPrice());
+                return ResponseEntity.ok().body("Order has been refunded successfully.");
+
+            } else {
+                // 如果為其他狀態就不給更改
+                return ResponseEntity.badRequest().body("Order cannot be refunded in its current state.");
+            }
+        } catch (IllegalStateException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("An error occurred while processing the refund request.");
         }
     }
 

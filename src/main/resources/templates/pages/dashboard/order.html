@@ -115,10 +115,16 @@
                         // Edit
                         let buttonHTML = "<button class='btn btn-primary profile-button' style='margin-top: 15px; width: 100px;' onclick=\"getOrderInfo('" + data + "')\">Edit</button>";
 
-                        // Confirm
+                        // Confirm Cancel
                         if (row.status === "CANCEL_REQUESTED") {
                             buttonHTML += "<button class='btn btn-success profile-button' style='margin-top: 15px; margin-left: 10px; width: 100px;' onclick=\"confirmCancel('" + data + "')\">Confirm</button>";
                         }
+
+                        // Confirm Refund
+                        if (row.status === "REFUND_REQUESTED") {
+                            buttonHTML += "<button class='btn btn-warning profile-button' style='margin-top: 15px; margin-left: 10px; width: 100px;' onclick=\"confirmRefund('" + data + "')\">Refund</button>";
+                        }
+
                         return buttonHTML;
                     },
                     "orderable": false // 禁用排序
@@ -245,6 +251,48 @@
                     .catch(error => {
                         console.error('Error:', error);
                         swal.fire("Error", "An error occurred while confirming cancellation.", "error");
+                    });
+            }
+        });
+    }
+
+    // 確認退款(linePay)
+    function confirmRefund(orderId) {
+        swal.fire({
+            title: "Are you sure?",
+            text: "Confirm to refund this order?",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes',
+            cancelButtonText: 'No',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                fetch(`/order/linePayRefund/${orderId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                })
+                    .then(response => {
+                        if (response.ok) {
+                            // 成功
+                            swal.fire({
+                                title: "Refunded!",
+                                text: "Order has been refunded successfully.",
+                                icon: "success",
+                            }).then(() => {
+                                // 關閉後重導
+                                window.location.reload();
+                            });
+                        } else {
+                            swal.fire("Error", "An error occurred while processing the refund.", "error");
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        swal.fire("Error", "An error occurred while confirming refund.", "error");
                     });
             }
         });

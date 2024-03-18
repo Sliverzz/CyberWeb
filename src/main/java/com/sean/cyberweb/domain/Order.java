@@ -38,6 +38,9 @@ public class Order {
     @Column(precision = 19, nullable = false)
     private BigDecimal totalPrice; // 訂單總價
 
+    @Column(unique = true)
+    private String transactionId;
+
     @CreationTimestamp
     @Column(name = "date_created", nullable = false, updatable = false)
     private LocalDateTime dateCreated; // 創建時間
@@ -68,13 +71,14 @@ public class Order {
     }
 
     public enum OrderStatus {
-        UNPAID,          // 未付款
-        PAID,            // 已付款
-        REFUNDED,        // 已退款
-        CANCELLED,       // 已取消
-        PROCESSING,      // 正在處理
-        SHIPPED,         // 已發貨
-        DELIVERED,       // 已送達
-        CANCEL_REQUESTED // 申請取消訂單中
+        UNPAID,           // 未付款
+        PAID,             // 已付款
+        REFUNDED,         // 已退款
+        CANCELLED,        // 已取消
+        PROCESSING,       // 正在處理
+        SHIPPED,          // 已發貨
+        DELIVERED,        // 已送達
+        CANCEL_REQUESTED, // 申請取消訂單中
+        REFUND_REQUESTED  // 申請退款中
     }
 }

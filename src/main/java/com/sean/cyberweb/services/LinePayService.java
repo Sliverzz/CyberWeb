@@ -117,6 +117,7 @@ public class LinePayService implements PaymentService {
             if (confirmResponse.getStatusCode().is2xxSuccessful() && confirmResponse.getBody() != null) {
                 // 更新訂單狀態
                 orderService.updateOrderStatus(orderId, Order.OrderStatus.PAID);
+                orderService.updateOrderTransactionId(orderId, transactionId);
                 System.out.println("Payment confirmation succeeded");
             } else {
                 System.out.println("Error response from LINE Pay confirmation API: " + confirmResponse.getBody());
@@ -125,6 +126,52 @@ public class LinePayService implements PaymentService {
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException("An exception occurred during payment confirmation process");
+        }
+    }
+
+    // RefundAPI
+    public void refundPayment(String transactionId, UUID orderId, BigDecimal refundAmount) {
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            String nonce = UUID.randomUUID().toString();
+            headers.set("X-LINE-ChannelId", channelId);
+            headers.set("X-LINE-Authorization-Nonce", nonce);
+
+            // 構建請求體，僅包含退款金額(如果指定）無則全額退款
+            Map<String, Object> requestBody = new HashMap<>();
+            if (refundAmount != null) {
+                requestBody.put("refundAmount", refundAmount);
+            }
+
+            String requestBodyJson = objectMapper.writeValueAsString(requestBody);
+
+            // 簽名
+            String signature = generateSignature(channelSecret, "/v3/payments/" + transactionId + "/refund", requestBodyJson, nonce);
+            headers.set("X-LINE-Authorization", signature);
+
+            HttpEntity<String> entity = new HttpEntity<>(requestBodyJson, headers);
+
+            // 退款URL
+            String refundPaymentUrl = linePayApiUrl + "/v3/payments/" + transactionId + "/refund";
+
+            // 發送退款請求
+            ResponseEntity<Map> refundResponse = restTemplate.postForEntity(refundPaymentUrl, entity, Map.class);
+
+            // 成功
+            if (refundResponse.getStatusCode().is2xxSuccessful() && refundResponse.getBody() != null) {
+                // 更新訂單狀態為以退款
+                if (refundAmount != null) {
+                    orderService.updateOrderStatus(orderId, Order.OrderStatus.REFUNDED);
+                }
+                System.out.println("Refund request succeeded");
+            } else {
+                System.out.println("Error response from LINE Pay refund API: " + refundResponse.getBody());
+                throw new RuntimeException("Refund request failed");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("An exception occurred during the refund process");
         }
     }
 
@@ -171,7 +218,7 @@ public class LinePayService implements PaymentService {
     }
 
 
-    // linePay官方規定的簽名檔(皆按照文件要求指定包的方法來撰寫)
+    // linePay官方規定的簽名檔(按照文件要求指定包的方法來撰寫)
     private String generateSignature(String channelSecret, String uri, String requestBody, String nonce) throws Exception {
         String message = channelSecret + uri + requestBody + nonce;
         Mac mac = Mac.getInstance("HmacSHA256");

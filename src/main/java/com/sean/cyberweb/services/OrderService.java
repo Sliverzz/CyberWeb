@@ -190,7 +190,7 @@ public class OrderService {
                 .map(OrderItemDto::getId)
                 .collect(Collectors.toSet());
 
-        // 移除不存在於前端傳來列表中的訂單項目，并補回相應的庫存
+        // 移除不存在於前端傳來列表中的訂單項目，並補回相應的庫存
         List<OrderItem> toRemove = order.getOrderItems().stream()
                 .filter(item -> !incomingItemIds.contains(item.getId()))
                 .toList();
@@ -198,7 +198,7 @@ public class OrderService {
             Product product = item.getProduct();
             int removedQuantity = item.getQuantity();
 
-            // 將删除的订单项数量加回产品库存
+            // 將刪除的訂單項數量加回產品庫存
             product.setStock(product.getStock() + removedQuantity);
             productRepository.save(product);
 
@@ -247,6 +247,15 @@ public class OrderService {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new IllegalStateException("Order with ID " + orderId + " does not exist."));
         order.setStatus(newStatus);
+        orderRepository.save(order);
+    }
+
+    // 單獨更新訂單的transactionId(linePay)
+    @Transactional
+    public void updateOrderTransactionId(UUID orderId, String transactionId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new IllegalStateException("Order with ID " + orderId + " does not exist."));
+        order.setTransactionId(transactionId); // 更新transactionId
         orderRepository.save(order);
     }
 
