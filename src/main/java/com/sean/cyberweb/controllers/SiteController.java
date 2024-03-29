@@ -50,7 +50,7 @@ public class SiteController {
 
         model.addAttribute("userHashId", userHashId);
         model.addAttribute("user", currentUser);
-        return "/pages/site/cart";
+        return "pages/site/cart";
     }
 
     // 會員個人資料管理
@@ -74,7 +74,7 @@ public class SiteController {
         model.addAttribute("user", currentUser);
         model.addAttribute("avatarUrl", avatarUrl); // 將頭像URL添加到模型
 
-        return "/pages/site/profile";
+        return "pages/site/profile";
     }
 
     // 個人訂單管理
@@ -88,6 +88,6 @@ public class SiteController {
 
         model.addAttribute("userHashId", userHashId);
         model.addAttribute("user", currentUser);
-        return "/pages/site/order";
+        return "pages/site/order";
     }
 }

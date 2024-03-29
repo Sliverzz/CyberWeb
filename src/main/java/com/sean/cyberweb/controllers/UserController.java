@@ -29,13 +29,13 @@ public class UserController {
     // 登入頁
     @GetMapping("/login")
     public String login(){
-        return "/pages/user/login";
+        return "pages/user/login";
     }
 
     // 註冊頁
     @GetMapping("/signUp")
     public String signUp(){
-        return "/pages/user/signUp";
+        return "pages/user/signUp";
     }
 
     // 註冊

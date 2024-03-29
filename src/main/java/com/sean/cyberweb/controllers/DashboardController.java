@@ -32,7 +32,7 @@ public class DashboardController {
 
         model.addAttribute("userHashId", userHashId);
         model.addAttribute("user", currentUser);
-        return "/pages/dashboard/index";
+        return "pages/dashboard/index";
     }
 
     // 使用者管理
@@ -56,7 +56,7 @@ public class DashboardController {
         model.addAttribute("user", currentUser);
         model.addAttribute("avatarUrl", avatarUrl); // 將頭像URL添加到模型
 
-        return "/pages/dashboard/profile";
+        return "pages/dashboard/profile";
     }
 
     // 產品
@@ -72,7 +72,7 @@ public class DashboardController {
         model.addAttribute("user", currentUser);
         model.addAttribute("productImagePath", productImagePath);
 
-        return "/pages/dashboard/product";
+        return "pages/dashboard/product";
     }
 
     // 訂單管理
@@ -86,6 +86,6 @@ public class DashboardController {
 
         model.addAttribute("userHashId", userHashId);
         model.addAttribute("user", currentUser);
-        return "/pages/dashboard/order";
+        return "pages/dashboard/order";
     }
 }
