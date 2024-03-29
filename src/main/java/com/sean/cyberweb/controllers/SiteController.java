@@ -36,7 +36,7 @@ public class SiteController {
             model.addAttribute("userHashId", userHashId);
             model.addAttribute("user", currentUser);
         }
-        return "/pages/site/index";
+        return "pages/site/index";
     }
 
     // 購物車
