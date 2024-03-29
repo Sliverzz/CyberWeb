@@ -66,7 +66,7 @@ public class DashboardController {
         User currentUser = userService.getCurrentUser();
 
         String userHashId = userService.encode(currentUser.getId());
-        String productImagePath = "/assets/img/no-image.jpg";
+        String productImagePath = "assets/img/no-image.jpg";
 
         model.addAttribute("userHashId", userHashId);
         model.addAttribute("user", currentUser);

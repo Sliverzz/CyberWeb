@@ -3,6 +3,7 @@ package com.sean.cyberweb.services;
 import com.sean.cyberweb.domain.Product;
 import com.sean.cyberweb.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -20,8 +21,15 @@ import java.util.List;
 @Service
 public class ProductService {
 
+    // PC圖片上傳位置
+    @Value("${imgPathPC}")
+    private String UPLOAD_DIR;
+
+    // MAC圖片上傳位置
+//  @Value("${imgPathMAC}")
+//  private String UPLOAD_DIR;
+
     private final ProductRepository productRepository;
-    private static final String UPLOAD_DIR = "C:\\Users\\ML2\\Desktop\\CyberWeb\\Img\\";
 
     @Autowired
     public ProductService(ProductRepository productRepository) {

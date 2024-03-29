@@ -3,6 +3,7 @@ package com.sean.cyberweb.services;
 import com.sean.cyberweb.domain.Role;
 import org.hashids.Hashids;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -23,10 +24,16 @@ import java.nio.file.StandardCopyOption;
 @Service
 public class UserService {
 
+    // PC圖片上傳位置
+    @Value("${imgPathPC}")
+    private String UPLOAD_DIR;
+
+    // MAC圖片上傳位置
+//  @Value("${imgPathMAC}")
+//  private String UPLOAD_DIR;
+
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
-    private static final String UPLOAD_DIR = "C:\\Users\\ML2\\Desktop\\CyberWeb\\Img\\"; //PC
-//    private static final String UPLOAD_DIR = "/Users/ml2_oao/Desktop/CyberWeb/Img"; //Mac
     private final Hashids hashids;
 
     @Autowired
