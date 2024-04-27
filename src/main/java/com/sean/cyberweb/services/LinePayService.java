@@ -188,8 +188,8 @@ public class LinePayService implements PaymentService {
 
         // 設定跳轉url
         Map<String, String> redirectUrls = new HashMap<>();
-        redirectUrls.put("confirmUrl", "http://localhost:8080/payment/confirm"); // 付款成功後返回的url
-        redirectUrls.put("cancelUrl", "http://localhost:8080/site/index"); // 付款取消後返回的url
+        redirectUrls.put("confirmUrl", "/payment/confirm"); // 付款成功後返回的url
+        redirectUrls.put("cancelUrl", "/site/index"); // 付款取消後返回的url
         requestBody.put("redirectUrls", redirectUrls);
 
         return requestBody;
