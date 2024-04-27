@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -188,8 +189,9 @@ public class LinePayService implements PaymentService {
 
         // 設定跳轉url
         Map<String, String> redirectUrls = new HashMap<>();
-        redirectUrls.put("confirmUrl", "/payment/confirm"); // 付款成功後返回的url
-        redirectUrls.put("cancelUrl", "/site/index"); // 付款取消後返回的url
+        String baseUrl = ServletUriComponentsBuilder.fromCurrentContextPath().build().toUriString();
+        redirectUrls.put("confirmUrl", baseUrl + "/payment/confirm"); // 成功url
+        redirectUrls.put("cancelUrl", baseUrl + "/site/index"); // 取消url
         requestBody.put("redirectUrls", redirectUrls);
 
         return requestBody;
